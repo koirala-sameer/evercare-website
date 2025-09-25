@@ -1,14 +1,25 @@
 import { Link, NavLink, useLocation } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import { Button } from './ui'
 import PromoBanner from './PromoBanner'
 
 export default function Navbar() {
-  const { pathname } = useLocation()
+  const { pathname, hash } = useLocation()
   const isHome = pathname === '/'
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
 
+  // --- Simple debounce to avoid double scrolls ---
+  const debounceRef = useRef<number | null>(null)
+  const debounce = (fn: () => void, delay = 60) => {
+    if (debounceRef.current) window.clearTimeout(debounceRef.current)
+    debounceRef.current = window.setTimeout(() => {
+      fn()
+      debounceRef.current = null
+    }, delay)
+  }
+
+  /** ---------- Effects ---------- */
   // Header shadow on scroll
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8)
@@ -17,19 +28,51 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  // Close mobile on route change
+  // Close mobile on route/hash change
   useEffect(() => {
     setMobileOpen(false)
-  }, [pathname])
+  }, [pathname, hash])
 
   // Prevent body scroll when mobile menu is open
   useEffect(() => {
-    if (mobileOpen) {
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = ''
-    }
+    document.body.style.overflow = mobileOpen ? 'hidden' : ''
   }, [mobileOpen])
+
+  // When arriving on Home with a hash (e.g., /#plans), scroll to it
+  useEffect(() => {
+    if (isHome && hash) {
+      const id = hash.replace('#', '')
+      debounce(() => {
+        const el = document.getElementById(id)
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }, 80)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isHome, hash])
+
+  /** ---------- Helpers ---------- */
+  const gotoAnchor = useCallback(
+    (id: string) => {
+      if (isHome) {
+        debounce(() => {
+          const el = document.getElementById(id)
+          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }, 60)
+      } else {
+        // Navigate to Home with hash; then scroll after load via the effect above
+        window.location.href = `/#${id}`
+      }
+    },
+    [isHome]
+  )
+
+  const handleAnchorClick =
+    (id: string) =>
+    (e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>) => {
+      e.preventDefault()
+      gotoAnchor(id)
+      setMobileOpen(false)
+    }
 
   return (
     <>
@@ -64,19 +107,47 @@ export default function Navbar() {
             >
               Home
             </NavLink>
-            <a href="#plans" className="text-sm text-slate-600 hover:text-slate-900">Plan</a>
-            <a href="#faq" className="text-sm text-slate-600 hover:text-slate-900">FAQ</a>
-            <a href="#contact" className="text-sm text-slate-600 hover:text-slate-900">Contact</a>
+
+            {/* Smooth-scroll anchors */}
+            <a
+              href="#services"
+              onClick={handleAnchorClick('services')}
+              className="text-sm text-slate-600 hover:text-slate-900"
+            >
+              Services
+            </a>
+            <a
+              href="#plans"
+              onClick={handleAnchorClick('plans')}
+              className="text-sm text-slate-600 hover:text-slate-900"
+            >
+              Plan
+            </a>
+            <a
+              href="#faq"
+              onClick={handleAnchorClick('faq')}
+              className="text-sm text-slate-600 hover:text-slate-900"
+            >
+              FAQ
+            </a>
+            <a
+              href="#contact"
+              onClick={handleAnchorClick('contact')}
+              className="text-sm text-slate-600 hover:text-slate-900"
+            >
+              Contact
+            </a>
           </nav>
 
           {/* CTA + Mobile toggle */}
           <div className="flex items-center gap-3">
             {/* Enroll now scrolls to the Plan section on Home */}
-            <a href="/#plans" className="hidden md:block">
-              <Button className="rounded-2xl bg-brand-teal px-5 py-2.5 text-sm font-semibold text-white shadow-soft hover:shadow-lg active:translate-y-0">
-                Enroll
-              </Button>
-            </a>
+            <Button
+              className="hidden md:inline-flex rounded-2xl bg-brand-teal px-5 py-2.5 text-sm font-semibold text-white shadow-soft hover:shadow-lg active:translate-y-0"
+              onClick={handleAnchorClick('plans')}
+            >
+              Enroll
+            </Button>
 
             <button
               className="md:hidden inline-flex items-center justify-center rounded-lg p-2 text-slate-600 hover:bg-slate-100"
@@ -128,25 +199,57 @@ export default function Navbar() {
             </div>
 
             <nav className="flex flex-col gap-1 p-3">
-              <NavLink to="/" onClick={() => setMobileOpen(false)} className="rounded-lg px-3 py-2 text-slate-700 hover:bg-slate-50">Home</NavLink>
-              <a href="#plans" onClick={() => setMobileOpen(false)} className="rounded-lg px-3 py-2 text-slate-700 hover:bg-slate-50">Plan</a>
-              <a href="#faq" onClick={() => setMobileOpen(false)} className="rounded-lg px-3 py-2 text-slate-700 hover:bg-slate-50">FAQ</a>
-              <a href="#contact" onClick={() => setMobileOpen(false)} className="rounded-lg px-3 py-2 text-slate-700 hover:bg-slate-50">Contact</a>
-              {/* Enroll goes to the plan section on Home */}
-              <a href="/#plans" onClick={() => setMobileOpen(false)} className="mt-2 rounded-xl bg-brand-teal px-3 py-2 text-sm font-semibold text-white shadow-soft">
-                Enroll
+              <NavLink
+                to="/"
+                onClick={() => setMobileOpen(false)}
+                className="rounded-lg px-3 py-2 text-slate-700 hover:bg-slate-50"
+              >
+                Home
+              </NavLink>
+              <a
+                href="#services"
+                onClick={handleAnchorClick('services')}
+                className="rounded-lg px-3 py-2 text-slate-700 hover:bg-slate-50"
+              >
+                Services
               </a>
+              <a
+                href="#plans"
+                onClick={handleAnchorClick('plans')}
+                className="rounded-lg px-3 py-2 text-slate-700 hover:bg-slate-50"
+              >
+                Plan
+              </a>
+              <a
+                href="#faq"
+                onClick={handleAnchorClick('faq')}
+                className="rounded-lg px-3 py-2 text-slate-700 hover:bg-slate-50"
+              >
+                FAQ
+              </a>
+              <a
+                href="#contact"
+                onClick={handleAnchorClick('contact')}
+                className="rounded-lg px-3 py-2 text-slate-700 hover:bg-slate-50"
+              >
+                Contact
+              </a>
+              {/* Enroll goes to the plan section */}
+              <button
+                onClick={handleAnchorClick('plans')}
+                className="mt-2 rounded-xl bg-brand-teal px-3 py-2 text-sm font-semibold text-white shadow-soft"
+              >
+                Enroll
+              </button>
             </nav>
           </div>
         </div>
 
-        {/* Sub-bar when on enroll flow */}
+        {/* Sub-bar when not on Home */}
         {!isHome && (
           <div className="w-full border-t border-slate-200 bg-slate-50 px-4 py-2 text-center text-sm text-slate-600">
             You’re viewing the enrollment flow.{' '}
-            <a href="/#plans" className="text-brand-teal underline">
-              Back to plan
-            </a>
+            <a href="/#plans" className="text-brand-teal underline">Back to plan</a>
           </div>
         )}
       </header>
