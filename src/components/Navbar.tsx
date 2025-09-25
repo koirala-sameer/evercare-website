@@ -45,7 +45,7 @@ export default function Navbar() {
         } backdrop-blur`}
       >
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2">
-          {/* Logo (bigger, without increasing header height) */}
+          {/* Logo */}
           <Link to="/" className="flex items-center">
             <img
               src="/logo.png"
@@ -71,11 +71,12 @@ export default function Navbar() {
 
           {/* CTA + Mobile toggle */}
           <div className="flex items-center gap-3">
-            <Link to="/enroll" className="hidden md:block">
+            {/* Enroll now scrolls to the Plan section on Home */}
+            <a href="/#plans" className="hidden md:block">
               <Button className="rounded-2xl bg-brand-teal px-5 py-2.5 text-sm font-semibold text-white shadow-soft hover:shadow-lg active:translate-y-0">
                 Enroll
               </Button>
-            </Link>
+            </a>
 
             <button
               className="md:hidden inline-flex items-center justify-center rounded-lg p-2 text-slate-600 hover:bg-slate-100"
@@ -131,9 +132,10 @@ export default function Navbar() {
               <a href="#plans" onClick={() => setMobileOpen(false)} className="rounded-lg px-3 py-2 text-slate-700 hover:bg-slate-50">Plan</a>
               <a href="#faq" onClick={() => setMobileOpen(false)} className="rounded-lg px-3 py-2 text-slate-700 hover:bg-slate-50">FAQ</a>
               <a href="#contact" onClick={() => setMobileOpen(false)} className="rounded-lg px-3 py-2 text-slate-700 hover:bg-slate-50">Contact</a>
-              <Link to="/enroll" onClick={() => setMobileOpen(false)} className="mt-2 rounded-xl bg-brand-teal px-3 py-2 text-sm font-semibold text-white shadow-soft">
+              {/* Enroll goes to the plan section on Home */}
+              <a href="/#plans" onClick={() => setMobileOpen(false)} className="mt-2 rounded-xl bg-brand-teal px-3 py-2 text-sm font-semibold text-white shadow-soft">
                 Enroll
-              </Link>
+              </a>
             </nav>
           </div>
         </div>
@@ -142,9 +144,9 @@ export default function Navbar() {
         {!isHome && (
           <div className="w-full border-t border-slate-200 bg-slate-50 px-4 py-2 text-center text-sm text-slate-600">
             You’re viewing the enrollment flow.{' '}
-            <NavLink to="/" className="text-brand-teal underline">
-              Back to site
-            </NavLink>
+            <a href="/#plans" className="text-brand-teal underline">
+              Back to plan
+            </a>
           </div>
         )}
       </header>

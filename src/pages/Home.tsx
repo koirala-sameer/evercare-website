@@ -25,7 +25,12 @@ function Hero() {
       <div className="pointer-events-none absolute inset-0 bg-[url('/banner-caregiver.jpg')] bg-cover bg-center opacity-15" />
       <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 px-6 py-24 md:grid-cols-2 md:py-32">
         <div>
-          <motion.div initial={{opacity:0, y:20}} whileInView={{opacity:1, y:0}} viewport={{once:true}} transition={{duration:0.6}}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
             <Badge>One Platform. Total Peace of Mind.</Badge>
             <h1 className="mt-5 text-4xl font-bold leading-tight text-brand-ink md:text-6xl">
               Care for your parents <span className="text-brand-teal">as if you were here.</span>
@@ -34,8 +39,26 @@ function Hero() {
               EverCare integrates daily living support, safety, health, and concierge services into a single membership designed for Nepali families with loved ones back home.
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
-              <Link to="/enroll"><Button className="flex items-center gap-2">Enroll now <ArrowRight className="h-4 w-4" /></Button></Link>
-              <a href="#plans"><GhostButton>See plan</GhostButton></a>
+              {/* Upgraded primary CTA */}
+              <a href="#plans">
+                <Button
+                  className="
+                    relative inline-flex items-center gap-2 rounded-2xl px-6 py-3 text-base font-semibold
+                    bg-brand-teal text-white shadow-[0_10px_20px_rgba(97,191,192,0.35)]
+                    hover:shadow-[0_16px_32px_rgba(97,191,192,0.45)] hover:translate-y-[-1px]
+                    active:translate-y-[0px] active:shadow-[0_8px_16px_rgba(97,191,192,0.35)]
+                    transition-all duration-200
+                    focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-teal focus-visible:ring-offset-2
+                    before:pointer-events-none before:absolute before:inset-0 before:rounded-[inherit]
+                    before:bg-gradient-to-b before:from-white/25 before:to-white/0
+                  "
+                >
+                  Enroll now <ArrowRight className="h-4 w-4" />
+                </Button>
+              </a>
+              <a href="#plans">
+                <GhostButton>See plan</GhostButton>
+              </a>
             </div>
             <div className="mt-8 flex items-center gap-6 text-sm text-slate-600">
               <span className="inline-flex items-center gap-2"><ShieldCheck className="h-5 w-5 text-brand-teal" /> 24/7 security</span>
@@ -45,7 +68,13 @@ function Hero() {
           </motion.div>
         </div>
         <div className="relative">
-          <motion.div initial={{opacity:0, scale:0.95}} whileInView={{opacity:1, scale:1}} viewport={{once:true}} transition={{duration:0.6}} className="glass relative rounded-3xl p-6">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="glass relative rounded-3xl p-6"
+          >
             <img src="/banner-caregiver.jpg" className="h-[420px] w-full rounded-2xl object-cover" alt="Caregiver with senior in a flower garden" />
             <div className="absolute -bottom-6 left-6 right-6 rounded-2xl border border-slate-200 bg-white p-4 shadow-soft">
               <div className="flex items-center gap-3">
@@ -69,7 +98,7 @@ function TrustBar() {
   return (
     <section className="border-y border-slate-200 bg-white/60">
       <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-8 px-6 py-6 text-slate-600">
-        <div className="flex items-center gap-2"><img src="/logo.png" className="h-6 w-6" /><span>Radical transparency</span></div>
+        <div className="flex items-center gap-2"><img src="/logo.png" className="h-6 w-6" alt="" /><span>Radical transparency</span></div>
         <div className="flex items-center gap-2"><UserRoundCheck className="h-5 w-5 text-brand-teal" /><span>Verified caregivers</span></div>
         <div className="flex items-center gap-2"><ShieldCheck className="h-5 w-5 text-brand-teal" /><span>Safety-first operations</span></div>
         <div className="flex items-center gap-2"><Clock className="h-5 w-5 text-brand-teal" /><span>Fast response</span></div>
@@ -118,39 +147,51 @@ function Plans() {
       <div className="relative mx-auto max-w-7xl px-6 py-24">
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="text-4xl font-bold text-brand-ink">One simple membership</h2>
-          <p className="mt-3 text-lg text-slate-700">Everything for daily living and safety. Add specialized services anytime.</p>
+          <p className="mt-3 text-lg text-slate-700">
+            A single plan for daily living and safety. Add specialized services later only if you need them.
+          </p>
         </div>
-        <div className="mt-10 grid grid-cols-1 gap-8 md:grid-cols-2">
-          <Card>
+
+        <div className="mt-10 grid grid-cols-1 gap-8">
+          <Card className="card-soft p-6 md:p-8">
             <h3 className="text-2xl font-semibold text-brand-ink">Standard Basic Plan</h3>
-            <p className="mt-3 text-slate-700">Includes maid services, home care visits, 24/7 security surveillance, and on-demand driver access.</p>
-            <ul className="mt-6 space-y-3 text-slate-700">
+            <p className="mt-3 text-slate-700">
+              Everything you need for day-to-day support and peace of mind — streamlined, reliable, transparent.
+            </p>
+            <ul className="mt-6 grid gap-3 text-slate-700 md:grid-cols-2">
               <li>• Dedicated care manager</li>
-              <li>• Emergency coordination</li>
+              <li>• Weekly wellness check-ins</li>
+              <li>• Errand coordination & bookings</li>
               <li>• Family updates & dashboards</li>
-              <li>• Transparent billing</li>
+              <li>• 24/7 safety monitoring & emergency coordination</li>
+              <li>• On-demand driver access</li>
             </ul>
             <div className="mt-8 flex items-center justify-between">
               <div>
                 <div className="text-sm text-slate-600">Starting from</div>
-                <div className="text-3xl font-bold text-brand-ink">NPR 24,999<span className="text-base font-medium text-slate-600">/mo</span></div>
+                <div className="text-3xl font-bold text-brand-ink">
+                  NPR 24,999<span className="text-base font-medium text-slate-600">/mo</span>
+                </div>
               </div>
-              <Link to="/enroll"><Button>Enroll</Button></Link>
+              <Link to="/enroll">
+                {/* Upgraded primary CTA */}
+                <Button
+                  className="
+                    relative rounded-2xl px-6 py-3 text-base font-semibold
+                    bg-brand-teal text-white shadow-[0_10px_20px_rgba(97,191,192,0.35)]
+                    hover:shadow-[0_16px_32px_rgba(97,191,192,0.45)] hover:translate-y-[-1px]
+                    active:translate-y-[0px] active:shadow-[0_8px_16px_rgba(97,191,192,0.35)]
+                    transition-all duration-200
+                    focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-teal focus-visible:ring-offset-2
+                    before:pointer-events-none before:absolute before:inset-0 before:rounded-[inherit]
+                    before:bg-gradient-to-b before:from-white/25 before:to-white/0
+                  "
+                >
+                  Proceed to Add-Ons
+                </Button>
+              </Link>
             </div>
             <p className="mt-3 text-xs text-slate-500">*Pricing is placeholder; finalize in admin.</p>
-          </Card>
-
-          <Card>
-            <h3 className="text-2xl font-semibold text-brand-ink">Add-Ons</h3>
-            <p className="mt-3 text-slate-700">Choose one-time or recurring services as needed. No tiers—just flexible add-ons.</p>
-            <div className="mt-6 flex flex-wrap gap-3">
-              {['Physiotherapy', 'Events', 'Telemedicine', 'Dementia Care', 'Concierge'].map((t) => (
-                <span key={t} className="rounded-full bg-brand-coral/10 px-3 py-1 text-sm text-brand-coral">{t}</span>
-              ))}
-            </div>
-            <div className="mt-8">
-              <Link to="/enroll"><GhostButton>Build your plan</GhostButton></Link>
-            </div>
           </Card>
         </div>
       </div>
@@ -215,7 +256,7 @@ function Footer() {
     <footer className="border-t border-slate-200 bg-white">
       <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-6 py-10 md:flex-row">
         <div className="flex items-center gap-3">
-          <img src="/logo.png" className="h-8 w-8" />
+          <img src="/logo.png" className="h-8 w-8" alt="" />
           <span className="text-sm text-slate-600">© {new Date().getFullYear()} EverCare Nepal</span>
         </div>
         <div className="text-sm text-slate-600">Made with ❤️ for families everywhere</div>

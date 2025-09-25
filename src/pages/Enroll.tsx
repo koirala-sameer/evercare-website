@@ -1,101 +1,185 @@
+import { useState } from 'react'
 import Navbar from '../components/Navbar'
-import { Card, Button } from '../components/ui'
-import { addons, BASE_PRICE, AddOn } from '../data/addons'
-import { currency } from '../utils/money'
-import { useMemo, useState } from 'react'
+import { Card, Button, GhostButton, Badge } from '../components/ui'
+import { Link } from 'react-router-dom'
+import { Check, Heart, Stethoscope, Activity, Calendar, Car, Brain } from 'lucide-react'
 
 export default function Enroll() {
-  const [selected, setSelected] = useState<Record<string, boolean>>({})
-  const [notes, setNotes] = useState('')
+  const [selected, setSelected] = useState<string[]>([])
 
-  const total = useMemo(() => {
-    const addOnTotal = addons.reduce((sum, a) => sum + (selected[a.id] ? a.price : 0), 0)
-    return BASE_PRICE + addOnTotal
-  }, [selected])
-
-  function toggle(id: string) {
-    setSelected(s => ({...s, [id]: !s[id]}))
+  const toggle = (id: string) => {
+    setSelected((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    )
   }
 
+  const total =
+    BASE_PLAN.price +
+    ADDONS.filter((a) => selected.includes(a.id)).reduce((sum, a) => sum + a.price, 0)
+
   return (
-    <div className="min-h-screen bg-brand-cloud/50">
+    <div className="min-h-screen w-full bg-brand-cloud">
       <Navbar />
-      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-8 px-6 py-10 md:grid-cols-3">
-        {/* Left: selection */}
-        <div className="md:col-span-2 space-y-6">
-          <Card>
-            <h2 className="text-2xl font-semibold text-brand-ink">Basic Subscription</h2>
-            <p className="mt-2 text-slate-700">Includes maid, home care, 24/7 security surveillance and on‑demand driver access.</p>
-            <div className="mt-4 rounded-2xl bg-brand-teal/5 p-4 text-brand-ink">
-              <span className="text-sm">Base price</span>
-              <div className="text-2xl font-bold">{currency.format(BASE_PRICE)} <span className="text-base font-medium text-slate-600">/ month</span></div>
-            </div>
-          </Card>
 
-          <Card>
-            <div className="flex items-center justify-between">
-              <h3 className="text-xl font-semibold text-brand-ink">A la carte add‑ons</h3>
-              <span className="text-sm text-slate-600">Choose any combination</span>
+      <section className="bg-white">
+        <div className="mx-auto max-w-7xl px-6 py-16 grid gap-10 md:grid-cols-3">
+          {/* Left: Add-Ons Checklist */}
+          <div className="md:col-span-2 space-y-10">
+            <div>
+              <Badge>Step 2 of 2</Badge>
+              <h1 className="mt-4 text-3xl font-semibold tracking-tight text-brand-ink md:text-4xl">
+                Customize with Add-Ons
+              </h1>
+              <p className="mt-2 text-lg text-slate-700">
+                The Standard Basic Plan is included. Choose optional services to tailor care for your family.
+              </p>
             </div>
-            <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
-              {addons.map((a) => (
-                <label key={a.id} className={`cursor-pointer rounded-2xl border p-4 transition ${selected[a.id] ? 'border-brand-teal bg-brand-teal/5' : 'border-slate-200 bg-white'}`}>
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <div className="font-medium text-brand-ink">{a.name}</div>
-                      <p className="mt-1 text-sm text-slate-600">{a.description}</p>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-sm text-slate-500">+ {currency.format(a.price)}/mo</div>
-                      <input
-                        type="checkbox"
-                        className="mt-2 h-5 w-5 accent-[var(--brand-teal)]"
-                        checked={!!selected[a.id]}
-                        onChange={() => toggle(a.id)}
-                      />
-                    </div>
-                  </div>
-                  <div className="mt-2 text-xs text-slate-500">{a.category}</div>
-                </label>
-              ))}
-            </div>
-          </Card>
 
-          <Card>
-            <h3 className="text-xl font-semibold text-brand-ink">Notes & special requests</h3>
-            <textarea value={notes} onChange={e=>setNotes(e.target.value)} placeholder="Tell us about routines, medications, preferences…"
-              className="mt-3 w-full rounded-2xl border border-slate-300 p-3 outline-none ring-brand-teal focus:ring-2" rows={4} />
-          </Card>
-        </div>
-
-        {/* Right: summary */}
-        <div className="md:col-span-1">
-          <div className="sticky top-24">
-            <Card>
-              <h3 className="text-xl font-semibold text-brand-ink">Your plan</h3>
-              <div className="mt-4 space-y-3 text-sm">
-                <div className="flex items-center justify-between">
-                  <span>Basic subscription</span>
-                  <span className="font-medium">{currency.format(BASE_PRICE)}</span>
-                </div>
-                {addons.filter(a => selected[a.id]).map((a) => (
-                  <div key={a.id} className="flex items-center justify-between">
-                    <span className="text-slate-700">{a.name}</span>
-                    <span className="text-slate-700">+ {currency.format(a.price)}</span>
-                  </div>
-                ))}
-                <hr className="my-2" />
-                <div className="flex items-center justify-between text-lg">
-                  <span className="font-semibold text-brand-ink">Total monthly</span>
-                  <span className="font-bold text-brand-ink">{currency.format(total)}</span>
+            {CATEGORIES.map((cat) => (
+              <div key={cat.name} className="space-y-4">
+                <h2 className="text-xl font-semibold text-brand-ink">{cat.name}</h2>
+                <div className="grid gap-4 md:grid-cols-2">
+                  {ADDONS.filter((a) => a.category === cat.name).map((a) => (
+                    <Card
+                      key={a.id}
+                      onClick={() => toggle(a.id)}
+                      className={`cursor-pointer border-2 transition ${
+                        selected.includes(a.id)
+                          ? 'border-brand-teal ring-1 ring-brand-teal/50'
+                          : 'border-transparent hover:border-slate-200'
+                      }`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="mt-1 grid h-10 w-10 place-items-center rounded-xl bg-brand-teal/10">
+                          {a.icon}
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-medium text-brand-ink flex items-center gap-2">
+                            {a.title}
+                            {selected.includes(a.id) && (
+                              <Check className="h-4 w-4 text-brand-teal" />
+                            )}
+                          </h3>
+                          <p className="text-sm text-slate-600">{a.desc}</p>
+                          <p className="mt-1 text-sm font-semibold text-brand-ink">
+                            NPR {a.price.toLocaleString()}
+                          </p>
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
                 </div>
               </div>
-              <button className="mt-6 w-full rounded-2xl bg-brand-coral px-5 py-3 font-medium text-white shadow-soft transition hover:-translate-y-0.5 hover:shadow-lg">Continue</button>
-              <p className="mt-2 text-center text-xs text-slate-500">No payment due now. We’ll contact you to finalize details.</p>
+            ))}
+          </div>
+
+          {/* Right: Price Summary */}
+          <div className="md:sticky md:top-24 h-fit">
+            <Card className="p-6 shadow-lg">
+              <h2 className="text-xl font-semibold text-brand-ink mb-4">Your Plan</h2>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between text-slate-700">
+                  <span>{BASE_PLAN.title}</span>
+                  <span className="font-medium">NPR {BASE_PLAN.price.toLocaleString()}</span>
+                </div>
+                {ADDONS.filter((a) => selected.includes(a.id)).map((a) => (
+                  <div
+                    key={a.id}
+                    className="flex items-center justify-between text-slate-600 text-sm"
+                  >
+                    <span>{a.title}</span>
+                    <span>NPR {a.price.toLocaleString()}</span>
+                  </div>
+                ))}
+                <hr className="my-4 border-slate-200" />
+                <div className="flex items-center justify-between text-lg font-semibold text-brand-ink">
+                  <span>Total</span>
+                  <span>NPR {total.toLocaleString()}</span>
+                </div>
+              </div>
+
+              <div className="mt-6 flex flex-col gap-3">
+                <Link to="/">
+                  <GhostButton className="w-full rounded-2xl">Back to Home</GhostButton>
+                </Link>
+                <Button className="w-full rounded-2xl">Confirm & Continue</Button>
+              </div>
             </Card>
           </div>
         </div>
-      </div>
+      </section>
+
+      <Footer />
     </div>
+  )
+}
+
+const BASE_PLAN = {
+  title: 'Standard Basic Plan',
+  price: 24999,
+}
+
+const CATEGORIES = [
+  { name: 'Health' },
+  { name: 'Lifestyle' },
+  { name: 'Special Care' },
+]
+
+const ADDONS = [
+  {
+    id: 'physio',
+    title: 'Physiotherapy',
+    desc: 'In-home sessions to maintain mobility and strength.',
+    price: 5000,
+    category: 'Health',
+    icon: <Activity className="h-5 w-5 text-brand-teal" />,
+  },
+  {
+    id: 'telemed',
+    title: 'Telemedicine',
+    desc: 'On-demand video consults with trusted doctors.',
+    price: 3000,
+    category: 'Health',
+    icon: <Stethoscope className="h-5 w-5 text-brand-teal" />,
+  },
+  {
+    id: 'events',
+    title: 'Events & Outings',
+    desc: 'Planned activities, day trips, and social gatherings.',
+    price: 4000,
+    category: 'Lifestyle',
+    icon: <Calendar className="h-5 w-5 text-brand-teal" />,
+  },
+  {
+    id: 'concierge',
+    title: 'Concierge & Driver',
+    desc: 'Errands, shopping, and transport handled with care.',
+    price: 3500,
+    category: 'Lifestyle',
+    icon: <Car className="h-5 w-5 text-brand-teal" />,
+  },
+  {
+    id: 'dementia',
+    title: 'Dementia Care',
+    desc: 'Specialized routines and companionship for memory care.',
+    price: 6000,
+    category: 'Special Care',
+    icon: <Brain className="h-5 w-5 text-brand-teal" />,
+  },
+]
+
+function Footer() {
+  return (
+    <footer className="border-t border-slate-200 bg-white">
+      <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-6 py-10 md:flex-row">
+        <div className="flex items-center gap-3">
+          <img src="/logo.png" className="h-8 w-8" alt="EverCare logo" />
+          <span className="text-sm text-slate-600">
+            © {new Date().getFullYear()} EverCare Nepal
+          </span>
+        </div>
+        <div className="text-sm text-slate-600">Made with ❤️ for families everywhere</div>
+      </div>
+    </footer>
   )
 }
