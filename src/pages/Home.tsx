@@ -31,7 +31,10 @@ function Hero() {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <Badge>One Platform. Total Peace of Mind.</Badge>
+            {/* Badge in coral */}
+            <Badge className="bg-[#f58a8c]/10 text-[#f58a8c]">
+              One Platform. Total Peace of Mind.
+            </Badge>
             <h1 className="mt-5 text-4xl font-bold leading-tight text-brand-ink md:text-6xl">
               Care for your parents <span className="text-brand-teal">as if you were here.</span>
             </h1>
@@ -39,20 +42,8 @@ function Hero() {
               EverCare integrates daily living support, safety, health, and concierge services into a single membership designed for Nepali families with loved ones back home.
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
-              {/* Upgraded primary CTA */}
               <a href="#plans">
-                <Button
-                  className="
-                    relative inline-flex items-center gap-2 rounded-2xl px-6 py-3 text-base font-semibold
-                    bg-brand-teal text-white shadow-[0_10px_20px_rgba(97,191,192,0.35)]
-                    hover:shadow-[0_16px_32px_rgba(97,191,192,0.45)] hover:translate-y-[-1px]
-                    active:translate-y-[0px] active:shadow-[0_8px_16px_rgba(97,191,192,0.35)]
-                    transition-all duration-200
-                    focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-teal focus-visible:ring-offset-2
-                    before:pointer-events-none before:absolute before:inset-0 before:rounded-[inherit]
-                    before:bg-gradient-to-b before:from-white/25 before:to-white/0
-                  "
-                >
+                <Button className="flex items-center gap-2">
                   Enroll now <ArrowRight className="h-4 w-4" />
                 </Button>
               </a>
@@ -78,8 +69,9 @@ function Hero() {
             <img src="/banner-caregiver.jpg" className="h-[420px] w-full rounded-2xl object-cover" alt="Caregiver with senior in a flower garden" />
             <div className="absolute -bottom-6 left-6 right-6 rounded-2xl border border-slate-200 bg-white p-4 shadow-soft">
               <div className="flex items-center gap-3">
-                <div className="grid h-10 w-10 place-items-center rounded-xl bg-brand-teal/10">
-                  <Heart className="h-5 w-5 text-brand-teal" />
+                {/* Heart in coral */}
+                <div className="grid h-10 w-10 place-items-center rounded-xl bg-[#f58a8c]/10">
+                  <Heart className="h-5 w-5 text-[#f58a8c]" />
                 </div>
                 <div>
                   <p className="text-sm font-medium text-brand-ink">Compassion first</p>
@@ -127,10 +119,10 @@ function StorySections() {
               <h3 className="text-3xl font-semibold text-brand-ink md:text-4xl">{it.title}</h3>
               <p className="mt-4 text-lg text-slate-700">{it.text}</p>
               <ul className="mt-6 grid grid-cols-1 gap-3 text-slate-700 md:grid-cols-2">
-                <li className="rounded-2xl border border-slate-200 bg-white p-4">Reliable scheduling</li>
-                <li className="rounded-2xl border border-slate-200 bg-white p-4">Care manager updates</li>
-                <li className="rounded-2xl border border-slate-200 bg-white p-4">Digital payments & receipts</li>
-                <li className="rounded-2xl border border-slate-200 bg-white p-4">Family group access</li>
+                <li className="rounded-2xl border border-slate-200 bg-white hover:bg-[#f58a8c]/5 p-4 transition">Reliable scheduling</li>
+                <li className="rounded-2xl border border-slate-200 bg-white hover:bg-[#f58a8c]/5 p-4 transition">Care manager updates</li>
+                <li className="rounded-2xl border border-slate-200 bg-white hover:bg-[#f58a8c]/5 p-4 transition">Digital payments & receipts</li>
+                <li className="rounded-2xl border border-slate-200 bg-white hover:bg-[#f58a8c]/5 p-4 transition">Family group access</li>
               </ul>
             </div>
           </motion.div>
@@ -147,6 +139,7 @@ function Plans() {
       <div className="relative mx-auto max-w-7xl px-6 py-24">
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="text-4xl font-bold text-brand-ink">One simple membership</h2>
+          {/* Reverted back to slate text */}
           <p className="mt-3 text-lg text-slate-700">
             A single plan for daily living and safety. Add specialized services later only if you need them.
           </p>
@@ -174,19 +167,7 @@ function Plans() {
                 </div>
               </div>
               <Link to="/enroll">
-                {/* Upgraded primary CTA */}
-                <Button
-                  className="
-                    relative rounded-2xl px-6 py-3 text-base font-semibold
-                    bg-brand-teal text-white shadow-[0_10px_20px_rgba(97,191,192,0.35)]
-                    hover:shadow-[0_16px_32px_rgba(97,191,192,0.45)] hover:translate-y-[-1px]
-                    active:translate-y-[0px] active:shadow-[0_8px_16px_rgba(97,191,192,0.35)]
-                    transition-all duration-200
-                    focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-teal focus-visible:ring-offset-2
-                    before:pointer-events-none before:absolute before:inset-0 before:rounded-[inherit]
-                    before:bg-gradient-to-b before:from-white/25 before:to-white/0
-                  "
-                >
+                <Button className="px-6 py-3 text-base rounded-2xl shadow-lg hover:shadow-xl">
                   Proceed to Add-Ons
                 </Button>
               </Link>
@@ -201,13 +182,13 @@ function Plans() {
 
 function AlaCartePreview() {
   return (
-    <section id="why" className="bg-white">
+    <section id="why" className="bg-[#f58a8c]/5">
       <div className="mx-auto max-w-7xl px-6 py-24">
         <div className="grid gap-8 md:grid-cols-3">
           {[
             {icon: <ShieldCheck className="h-6 w-6 text-brand-teal" />, title: 'Safety-first', desc: '24/7 surveillance and proactive wellness checks.'},
             {icon: <Phone className="h-6 w-6 text-brand-teal" />, title: 'Transparent', desc: 'Every visit and spend is tracked and shared with family.'},
-            {icon: <Heart className="h-6 w-6 text-brand-teal" />, title: 'Compassionate', desc: 'We show up with heart, not just service lists.'},
+            {icon: <Heart className="h-6 w-6 text-[#f58a8c]" />, title: 'Compassionate', desc: 'We show up with heart, not just service lists.'},
           ].map((b, i) => (
             <Card key={i}>
               <div className="flex items-start gap-4">
