@@ -2,20 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --brand-teal: #61bfc0;
-  --brand-coral: #f58a8c;
-  --brand-ink: #0f172a;
-  --brand-cloud: #f8fafc;
+/* Smooth scroll for all in-page anchor links */
+html {
+  scroll-behavior: smooth;
 }
 
-.glass {
-  background: rgba(255,255,255,0.65);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255,255,255,0.6);
+/* Prevent sticky header from overlapping anchored sections */
+[id] {
+  scroll-margin-top: 6rem; /* adjust if navbar height changes */
 }
 
-.hero-gradient {
-  background: radial-gradient(1200px 600px at 10% -10%, rgba(15,181,168,0.15), transparent 60%),
-              radial-gradient(900px 500px at 100% 0%, rgba(255,111,133,0.18), transparent 50%);
+/* Optional: you can tweak this if your header height changes at breakpoints */
+@media (min-width: 768px) {
+  [id] {
+    scroll-margin-top: 7rem;
+  }
 }
