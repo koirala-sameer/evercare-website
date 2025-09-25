@@ -35,12 +35,12 @@ function Hero() {
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
               <Link to="/enroll"><Button className="flex items-center gap-2">Enroll now <ArrowRight className="h-4 w-4" /></Button></Link>
-              <a href="#plans"><GhostButton>See plans</GhostButton></a>
+              <a href="#plans"><GhostButton>See plan</GhostButton></a>
             </div>
             <div className="mt-8 flex items-center gap-6 text-sm text-slate-600">
               <span className="inline-flex items-center gap-2"><ShieldCheck className="h-5 w-5 text-brand-teal" /> 24/7 security</span>
-              <span className="inline-flex items-center gap-2"><Phone className="h-5 w-5 text-brand-teal" /> Real‑time updates</span>
-              <span className="hidden items-center gap-2 md:inline-flex"><Clock className="h-5 w-5 text-brand-teal" /> Same‑day requests</span>
+              <span className="inline-flex items-center gap-2"><Phone className="h-5 w-5 text-brand-teal" /> Real-time updates</span>
+              <span className="hidden items-center gap-2 md:inline-flex"><Clock className="h-5 w-5 text-brand-teal" /> Same-day requests</span>
             </div>
           </motion.div>
         </div>
@@ -54,7 +54,7 @@ function Hero() {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-brand-ink">Compassion first</p>
-                  <p className="text-xs text-slate-600">Trusted local team, diaspora‑grade transparency.</p>
+                  <p className="text-xs text-slate-600">Trusted local team, diaspora-grade transparency.</p>
                 </div>
               </div>
             </div>
@@ -71,7 +71,7 @@ function TrustBar() {
       <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-8 px-6 py-6 text-slate-600">
         <div className="flex items-center gap-2"><img src="/logo.png" className="h-6 w-6" /><span>Radical transparency</span></div>
         <div className="flex items-center gap-2"><UserRoundCheck className="h-5 w-5 text-brand-teal" /><span>Verified caregivers</span></div>
-        <div className="flex items-center gap-2"><ShieldCheck className="h-5 w-5 text-brand-teal" /><span>Safety‑first operations</span></div>
+        <div className="flex items-center gap-2"><ShieldCheck className="h-5 w-5 text-brand-teal" /><span>Safety-first operations</span></div>
         <div className="flex items-center gap-2"><Clock className="h-5 w-5 text-brand-teal" /><span>Fast response</span></div>
       </div>
     </section>
@@ -122,8 +122,8 @@ function Plans() {
         </div>
         <div className="mt-10 grid grid-cols-1 gap-8 md:grid-cols-2">
           <Card>
-            <h3 className="text-2xl font-semibold text-brand-ink">Basic Subscription</h3>
-            <p className="mt-3 text-slate-700">Includes maid services, home care visits, 24/7 security surveillance, and on‑demand driver access.</p>
+            <h3 className="text-2xl font-semibold text-brand-ink">Standard Basic Plan</h3>
+            <p className="mt-3 text-slate-700">Includes maid services, home care visits, 24/7 security surveillance, and on-demand driver access.</p>
             <ul className="mt-6 space-y-3 text-slate-700">
               <li>• Dedicated care manager</li>
               <li>• Emergency coordination</li>
@@ -139,9 +139,10 @@ function Plans() {
             </div>
             <p className="mt-3 text-xs text-slate-500">*Pricing is placeholder; finalize in admin.</p>
           </Card>
+
           <Card>
-            <h3 className="text-2xl font-semibold text-brand-ink">A la carte Add‑ons</h3>
-            <p className="mt-3 text-slate-700">Physiotherapy, events & outings, lab tests at home, dementia care, telemedicine, concierge and more.</p>
+            <h3 className="text-2xl font-semibold text-brand-ink">Add-Ons</h3>
+            <p className="mt-3 text-slate-700">Choose one-time or recurring services as needed. No tiers—just flexible add-ons.</p>
             <div className="mt-6 flex flex-wrap gap-3">
               {['Physiotherapy', 'Events', 'Telemedicine', 'Dementia Care', 'Concierge'].map((t) => (
                 <span key={t} className="rounded-full bg-brand-coral/10 px-3 py-1 text-sm text-brand-coral">{t}</span>
@@ -186,8 +187,8 @@ function AlaCartePreview() {
 function FAQ() {
   const items = [
     { q: 'Where do you operate first?', a: 'Launching in Kathmandu & Pokhara, expanding nationwide.' },
-    { q: 'Can I change add‑ons anytime?', a: 'Yes, add or remove services monthly from your dashboard.' },
-    { q: 'How do driver services work?', a: 'On‑demand with transparent per‑trip billing or monthly packages.' },
+    { q: 'Can I change add-ons anytime?', a: 'Yes, add or remove services monthly from your dashboard.' },
+    { q: 'How do driver services work?', a: 'On-demand with transparent per-trip billing or monthly packages.' },
     { q: 'Do you support medical emergencies?', a: 'We coordinate ambulances, hospitals, and family notifications.' },
   ]
   return (
