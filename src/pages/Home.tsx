@@ -2,7 +2,7 @@ import { motion, useScroll, useTransform } from 'framer-motion'
 import { useRef } from 'react'
 import { ArrowRight, ShieldCheck, Heart, Phone, Clock, UserRoundCheck } from 'lucide-react'
 import Navbar from '../components/Navbar'
-import { Button, Card, GhostButton } from '../components/ui' // Badge removed to avoid prop mismatch
+import { Button, Card, GhostButton } from '../components/ui'
 import { Link } from 'react-router-dom'
 
 export default function Home() {
@@ -13,7 +13,7 @@ export default function Home() {
       <TrustBar />
       <StorySections />
       <Plans />
-      <AlaCartePreview />
+      <AddOnsShowcase />
       <FAQ />
       <Footer />
     </div>
@@ -42,7 +42,7 @@ function Hero() {
 
   return (
     <section ref={heroRef} className="hero-gradient relative overflow-hidden">
-      {/* use valid Tailwind opacity scale for consistency across builds */}
+      {/* background image with valid tailwind opacity scale */}
       <div className="pointer-events-none absolute inset-0 bg-[url('/banner-caregiver.jpg')] bg-cover bg-center opacity-10 md:opacity-20" />
       <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 px-6 py-24 md:grid-cols-2 md:py-32">
         <motion.div
@@ -52,7 +52,7 @@ function Hero() {
           viewport={{ once: true, amount: 0.35 }}
         >
           <motion.div variants={fadeUp}>
-            {/* Pill in blushed coral for warmth (replaces <Badge /> to avoid className typing error) */}
+            {/* pill (instead of Badge) for compatibility */}
             <span className="inline-block rounded-full bg-[#f58a8c]/10 px-3 py-1 text-sm font-medium text-[#f58a8c]">
               One Platform. Total Peace of Mind.
             </span>
@@ -69,7 +69,8 @@ function Hero() {
             variants={fadeUp}
             className="mt-5 max-w-xl text-lg leading-relaxed text-slate-700"
           >
-            EverCare integrates daily living support, safety, health, and concierge services into a single membership designed for Nepali families with loved ones back home.
+            EverCare integrates daily living support, safety, health, and concierge services into a single
+            membership designed for Nepali families with loved ones back home.
           </motion.p>
 
           <motion.div variants={fadeUp} className="mt-8 flex flex-wrap gap-4">
@@ -228,6 +229,10 @@ function StorySections() {
   )
 }
 
+/** SINGLE PLAN + ADD-ONS MODEL
+ * We present exactly one Standard membership.
+ * Add-ons are shown separately as popular choices.
+ */
 function Plans() {
   return (
     <section id="plans" className="relative">
@@ -241,11 +246,10 @@ function Plans() {
           viewport={{ once: true, amount: 0.4 }}
         >
           <motion.h2 variants={fadeUp} className="text-4xl font-bold tracking-tight text-brand-ink md:text-5xl">
-            One simple membership
+            One Standard Membership
           </motion.h2>
-          {/* Reverted subtitle color per your direction */}
           <motion.p variants={fadeUp} className="mt-3 text-lg leading-relaxed text-slate-700">
-            A single plan for daily living and safety. Add specialized services later only if you need them.
+            Start with a single, all-round plan for daily living and safety. Add specialized services anytime.
           </motion.p>
         </motion.div>
 
@@ -258,7 +262,7 @@ function Plans() {
         >
           <motion.div whileHover={{ y: -2 }} transition={{ duration: 0.2 }}>
             <Card className="card-soft p-6 md:p-8">
-              <h3 className="text-2xl font-semibold text-brand-ink">Standard Basic Plan</h3>
+              <h3 className="text-2xl font-semibold text-brand-ink">Standard Plan</h3>
               <p className="mt-3 text-slate-700">
                 Everything you need for day-to-day support and peace of mind — streamlined, reliable, transparent.
               </p>
@@ -277,7 +281,7 @@ function Plans() {
                     NPR 24,999<span className="text-base font-medium text-slate-600">/mo</span>
                   </div>
                 </div>
-                <Link to="/enroll">
+                <a href="#addons">
                   <Button
                     className="
                       relative rounded-2xl px-6 py-3 text-base font-semibold
@@ -292,7 +296,7 @@ function Plans() {
                   >
                     Proceed to Add-Ons
                   </Button>
-                </Link>
+                </a>
               </div>
               <p className="mt-3 text-xs text-slate-500">*Pricing is placeholder; finalize in admin.</p>
             </Card>
@@ -303,24 +307,43 @@ function Plans() {
   )
 }
 
-function AlaCartePreview() {
+/** Popular Add-Ons grid (non-interactive showcase) */
+function AddOnsShowcase() {
   return (
-    <section id="why" className="bg-[#f58a8c]/5">
+    <section id="addons" className="bg-[#f58a8c]/5">
       <div className="mx-auto max-w-7xl px-6 py-24">
         <motion.div
-          className="grid gap-8 md:grid-cols-3"
+          className="mx-auto max-w-2xl text-center"
           variants={staggerParent}
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, amount: 0.35 }}
         >
+          <motion.h3 variants={fadeUp} className="text-3xl font-semibold tracking-tight text-brand-ink md:text-4xl">
+            Popular Add-Ons
+          </motion.h3>
+          <motion.p variants={fadeUp} className="mt-4 text-slate-700">
+            Extend your plan with specialist services anytime. No bundles, no lock-ins.
+          </motion.p>
+        </motion.div>
+
+        <motion.div
+          className="mt-10 grid gap-8 md:grid-cols-3"
+          variants={staggerParent}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.3 }}
+        >
           {[
-            {icon: <ShieldCheck className="h-6 w-6 text-brand-teal/90" />, title: 'Safety-first', desc: '24/7 surveillance and proactive wellness checks.'},
-            {icon: <Phone className="h-6 w-6 text-brand-teal/90" />, title: 'Transparent', desc: 'Every visit and spend is tracked and shared with family.'},
-            {icon: <Heart className="h-6 w-6 text-[#f58a8c]" />, title: 'Compassionate', desc: 'We show up with heart, not just service lists.'},
+            { icon: <ShieldCheck className="h-6 w-6 text-brand-teal/90" />, title: '24/7 On-Call Nurse', desc: 'Priority clinical support and triage when needed.' },
+            { icon: <Phone className="h-6 w-6 text-brand-teal/90" />, title: 'Telemedicine', desc: 'Doctor consults and follow-ups from home.' },
+            { icon: <Heart className="h-6 w-6 text-[#f58a8c]" />, title: 'Physiotherapy', desc: 'At-home sessions tailored to mobility goals.' },
+            { icon: <ShieldCheck className="h-6 w-6 text-brand-teal/90" />, title: 'Dementia Care', desc: 'Specialized routines and caregiver training.' },
+            { icon: <Phone className="h-6 w-6 text-brand-teal/90" />, title: 'Medication Delivery', desc: 'Refills and reminders handled end-to-end.' },
+            { icon: <Heart className="h-6 w-6 text-[#f58a8c]" />, title: 'Driver & Logistics', desc: 'Appointments, events, and errands on demand.' },
           ].map((b, i) => (
             <motion.div key={i} variants={fadeUp} whileHover={{ y: -3 }} transition={{ duration: 0.2 }}>
-              <Card>
+              <Card className="p-6">
                 <div className="flex items-start gap-4">
                   <div className="grid h-12 w-12 place-items-center rounded-2xl bg-brand-teal/10">{b.icon}</div>
                   <div>
@@ -332,6 +355,12 @@ function AlaCartePreview() {
             </motion.div>
           ))}
         </motion.div>
+
+        <div className="mt-10 text-center">
+          <Link to="/enroll">
+            <Button className="rounded-2xl px-6 py-3">Customize & Enroll</Button>
+          </Link>
+        </div>
       </div>
     </section>
   )
