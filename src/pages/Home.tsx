@@ -18,6 +18,7 @@ export default function Home() {
       <Plans />
       <AddOnsShowcase />
       <FAQ />
+      <FinalCTA />
       <Footer />
     </div>
   )
@@ -571,6 +572,50 @@ function FAQ() {
               <p className="mt-2 text-slate-700">{it.a}</p>
             </motion.details>
           ))}
+        </motion.div>
+      </div>
+    </section>
+  )
+}
+
+/* =========================================
+   FINAL CTA — cinematic closer above footer
+========================================= */
+function FinalCTA() {
+  return (
+    <section className="relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-b from-brand-cloud/60 via-white to-white" />
+      <div className="relative mx-auto max-w-5xl px-6 py-20 text-center">
+        <motion.div
+          variants={staggerParent}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.35 }}
+          className="space-y-6"
+        >
+          <motion.h3
+            variants={fadeUp}
+            className="text-3xl font-semibold leading-tight tracking-tight text-brand-ink md:text-4xl"
+          >
+            One platform. Total peace of mind.
+          </motion.h3>
+          <motion.p variants={fadeUp} className="mx-auto max-w-2xl text-slate-700">
+            Start with the Standard membership today and add specialized services anytime — transparent,
+            flexible, and built for families abroad.
+          </motion.p>
+          <motion.div
+            variants={fadeUp}
+            className="mt-4 flex flex-wrap justify-center gap-3"
+          >
+            <Link to="/enroll">
+              <Button className="rounded-2xl px-6 py-3">
+                Get started <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
+            <a href="#plans">
+              <GhostButton className="rounded-2xl px-6 py-3">See what’s included</GhostButton>
+            </a>
+          </motion.div>
         </motion.div>
       </div>
     </section>
