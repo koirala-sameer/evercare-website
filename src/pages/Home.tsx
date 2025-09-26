@@ -1,5 +1,5 @@
 import { motion, useScroll, useTransform } from 'framer-motion'
-import { useRef } from 'react'
+import { useRef, useEffect, useState } from 'react'
 import { ArrowRight, ShieldCheck, Heart, Phone, Clock, UserRoundCheck } from 'lucide-react'
 import Navbar from '../components/Navbar'
 import { Button, Card, GhostButton } from '../components/ui'
@@ -12,6 +12,7 @@ export default function Home() {
       <Hero />
       <TrustBar />
       <StorySections />
+      <ImpactStats />
       <Plans />
       <AddOnsShowcase />
       <FAQ />
@@ -28,6 +29,65 @@ const staggerParent = {
 const fadeUp = {
   hidden: { opacity: 0, y: 18 },
   show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
+}
+
+/** ---------- AnimatedNumber (self-contained, no extra deps) ---------- */
+type AnimatedNumberProps = {
+  to: number
+  from?: number
+  duration?: number // seconds
+  prefix?: string
+  suffix?: string
+  className?: string
+  formatter?: (v: number) => string
+}
+
+function AnimatedNumber({
+  to,
+  from = 0,
+  duration = 1.6,
+  prefix = '',
+  suffix = '',
+  className,
+  formatter = (v) => v.toLocaleString(),
+}: AnimatedNumberProps) {
+  const [val, setVal] = useState(from)
+  const [hasAnimated, setHasAnimated] = useState(false)
+  const ref = useRef<HTMLSpanElement | null>(null)
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !hasAnimated) {
+          setHasAnimated(true)
+          const start = performance.now()
+          const tick = (now: number) => {
+            const t = Math.min((now - start) / (duration * 1000), 1)
+            const ease = 1 - Math.pow(1 - t, 3) // easeOutCubic
+            const current = from + (to - from) * ease
+            setVal(current)
+            if (t < 1) requestAnimationFrame(tick)
+          }
+          requestAnimationFrame(tick)
+        }
+      },
+      { threshold: 0.5 }
+    )
+
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [from, to, duration, hasAnimated])
+
+  return (
+    <span ref={ref} className={className}>
+      {prefix}
+      {formatter(Math.round(val))}
+      {suffix}
+    </span>
+  )
 }
 
 function Hero() {
@@ -229,10 +289,59 @@ function StorySections() {
   )
 }
 
-/** SINGLE PLAN + ADD-ONS MODEL
- * We present exactly one Standard membership.
- * Add-ons are shown separately as popular choices.
- */
+/* =========================================
+   IMPACT STATS — animated counters
+   (Drop-in, no new deps, uses IntersectionObserver)
+========================================= */
+function ImpactStats() {
+  return (
+    <section className="bg-white">
+      <div className="mx-auto max-w-7xl px-6 py-20">
+        <motion.div
+          className="mx-auto max-w-2xl text-center"
+          variants={staggerParent}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.35 }}
+        >
+          <motion.h3 variants={fadeUp} className="text-3xl font-semibold tracking-tight text-brand-ink md:text-4xl">
+            We’re already making a difference
+          </motion.h3>
+          <motion.p variants={fadeUp} className="mt-4 text-slate-700">
+            Quietly reliable, always present — and built for families abroad.
+          </motion.p>
+        </motion.div>
+
+        <motion.div
+          variants={staggerParent}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.35 }}
+          className="mt-12 grid grid-cols-2 gap-6 md:grid-cols-4"
+        >
+          <motion.div variants={fadeUp} className="rounded-2xl border border-slate-200 bg-white p-6 text-center">
+            <AnimatedNumber to={2500} suffix="+" className="text-4xl font-bold text-brand-ink" />
+            <p className="mt-2 text-sm text-slate-600">Hours of care delivered</p>
+          </motion.div>
+          <motion.div variants={fadeUp} className="rounded-2xl border border-slate-200 bg-white p-6 text-center">
+            <AnimatedNumber to={100} suffix="%" className="text-4xl font-bold text-brand-ink" />
+            <p className="mt-2 text-sm text-slate-600">Verified caregivers</p>
+          </motion.div>
+          <motion.div variants={fadeUp} className="rounded-2xl border border-slate-200 bg-white p-6 text-center">
+            <AnimatedNumber to={2} suffix="+" className="text-4xl font-bold text-brand-ink" />
+            <p className="mt-2 text-sm text-slate-600">Cities live (KTM, PKR)</p>
+          </motion.div>
+          <motion.div variants={fadeUp} className="rounded-2xl border border-slate-200 bg-white p-6 text-center">
+            <AnimatedNumber to={0} className="text-4xl font-bold text-brand-ink" />
+            <p className="mt-2 text-sm text-slate-600">Missed check-ins</p>
+          </motion.div>
+        </motion.div>
+      </div>
+    </section>
+  )
+}
+
+/** SINGLE PLAN + ADD-ONS MODEL */
 function Plans() {
   return (
     <section id="plans" className="relative">
