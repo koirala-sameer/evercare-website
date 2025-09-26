@@ -1,6 +1,18 @@
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { useRef, useEffect, useState } from 'react'
-import { ArrowRight, ShieldCheck, Heart, Phone, Clock, UserRoundCheck, ChevronLeft, ChevronRight } from 'lucide-react'
+import {
+  ArrowRight,
+  ShieldCheck,
+  Heart,
+  Phone,
+  Clock,
+  UserRoundCheck,
+  ChevronLeft,
+  ChevronRight,
+  Users,
+  Home as HomeIcon,
+  Stethoscope
+} from 'lucide-react'
 import Navbar from '../components/Navbar'
 import { Button, Card, GhostButton } from '../components/ui'
 import { Link } from 'react-router-dom'
@@ -11,8 +23,8 @@ export default function Home() {
       <Navbar />
       <Hero />
       <TrustBar />
-      <MissionBlock />
       <NarrativeLine />
+      <WhoItsFor />
       <StorySections />
       <Testimonials />
       <ImpactStats />
@@ -244,53 +256,7 @@ function TrustBar() {
   )
 }
 
-function MissionBlock() {
-  return (
-    <section className="bg-white">
-      <div className="mx-auto max-w-5xl px-6 py-20">
-        <motion.div
-          className="rounded-3xl border border-slate-200 bg-white/70 p-8 md:p-12 shadow-soft backdrop-blur"
-          variants={staggerParent}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.35 }}
-        >
-          <motion.div variants={fadeUp} className="flex items-start gap-4">
-            <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-brand-teal/10">
-              <Heart className="h-6 w-6 text-brand-teal/90" />
-            </div>
-            <div>
-              <p className="text-xl leading-relaxed text-brand-ink md:text-2xl">
-                <em>
-                  “Families abroad shouldn’t worry every night. We built EverCare so parents in Nepal
-                  live with dignity, safety, and joy—while you see everything clearly from anywhere.”
-                </em>
-              </p>
-              <div className="mt-4 text-sm text-slate-600">— The EverCare Team</div>
-            </div>
-          </motion.div>
-
-          <motion.div variants={fadeUp} className="mt-8 grid gap-4 md:grid-cols-3">
-            <div className="rounded-2xl border border-slate-200 bg-white p-4">
-              <p className="text-sm font-medium text-brand-ink">Compassion, measured</p>
-              <p className="mt-1 text-sm text-slate-700">Care that shows up—on time, with heart, and with proof.</p>
-            </div>
-            <div className="rounded-2xl border border-slate-200 bg-white p-4">
-              <p className="text-sm font-medium text-brand-ink">Transparency, always</p>
-              <p className="mt-1 text-sm text-slate-700">Every visit, every rupee, visible to the family dashboard.</p>
-            </div>
-            <div className="rounded-2xl border border-slate-200 bg-white p-4">
-              <p className="text-sm font-medium text-brand-ink">Care that scales</p>
-              <p className="mt-1 text-sm text-slate-700">Start simple, add specialists only when needed.</p>
-            </div>
-          </motion.div>
-        </motion.div>
-      </div>
-    </section>
-  )
-}
-
-/* Slim narrative line (replaces the collage section) */
+/* Slim narrative line (kept) */
 function NarrativeLine() {
   return (
     <section className="bg-white">
@@ -304,6 +270,86 @@ function NarrativeLine() {
         >
           Real moments — from meals to medicine to meaningful time outside.
         </motion.p>
+      </div>
+    </section>
+  )
+}
+
+/* =========================================
+   WHO IT'S FOR — audience row
+========================================= */
+function WhoItsFor() {
+  const items = [
+    {
+      icon: <Users className="h-6 w-6" />,
+      title: 'Diaspora children',
+      bullets: ['See updates in real time', 'Request help same day', 'Pay digitally & share access'],
+      tint: 'from-brand-teal/15 to-[#6fd1d2]/15',
+      dot: 'bg-brand-teal',
+    },
+    {
+      icon: <HomeIcon className="h-6 w-6" />,
+      title: 'Local parents',
+      bullets: ['Trusted caregivers', 'Predictable routines', 'Respectful, friendly support'],
+      tint: 'from-[#f58a8c]/15 to-[#f9b3b4]/15',
+      dot: 'bg-[#f58a8c]',
+    },
+    {
+      icon: <Stethoscope className="h-6 w-6" />,
+      title: 'Care managers',
+      bullets: ['Clear SOPs & logs', 'Escalation playbooks', 'Family communication handled'],
+      tint: 'from-brand-cloud/60 to-white',
+      dot: 'bg-slate-400',
+    },
+  ]
+
+  return (
+    <section className="bg-white">
+      <div className="mx-auto max-w-7xl px-6 py-12">
+        <motion.div
+          className="mx-auto max-w-2xl text-center"
+          variants={staggerParent}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.35 }}
+        >
+          <motion.h3 variants={fadeUp} className="text-3xl font-semibold tracking-tight text-brand-ink md:text-4xl">
+            Who it’s for
+          </motion.h3>
+          <motion.p variants={fadeUp} className="mt-3 text-slate-700">
+            Built for tight-knit families and the teams who care for them.
+          </motion.p>
+        </motion.div>
+
+        <motion.div
+          variants={staggerParent}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.35 }}
+          className="mt-10 grid gap-6 md:grid-cols-3"
+        >
+          {items.map((it, i) => (
+            <motion.div key={i} variants={fadeUp} whileHover={{ y: -3 }} transition={{ duration: 0.2 }}>
+              <Card className="relative overflow-hidden p-6">
+                <div className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${it.tint}`} />
+                <div className="relative z-10">
+                  <div className="mb-4 inline-grid h-12 w-12 place-items-center rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
+                    {it.icon}
+                  </div>
+                  <h4 className="text-xl font-semibold text-brand-ink">{it.title}</h4>
+                  <ul className="mt-3 space-y-2 text-slate-700">
+                    {it.bullets.map((b, k) => (
+                      <li key={k} className="flex items-start gap-2">
+                        <span className={`mt-2 inline-block h-1.5 w-1.5 rounded-full ${it.dot}`} />
+                        <span>{b}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </Card>
+            </motion.div>
+          ))}
+        </motion.div>
       </div>
     </section>
   )
@@ -360,8 +406,7 @@ function StorySections() {
 }
 
 /* =========================================
-   TESTIMONIALS — overlap fixed + vibrant accents
-   (No absolute stacking; single Card swaps content)
+   TESTIMONIALS — overlap-free + vibrant accents
 ========================================= */
 function Testimonials() {
   const items = [
@@ -421,7 +466,6 @@ function Testimonials() {
           onMouseEnter={() => setPaused(true)}
           onMouseLeave={() => setPaused(false)}
         >
-          {/* Single card that swaps content (no absolute layers) */}
           <motion.div
             key={idx}
             initial={{ opacity: 0, y: 8 }}
@@ -430,7 +474,6 @@ function Testimonials() {
             transition={{ duration: 0.35, ease: 'easeOut' }}
           >
             <Card className="relative overflow-hidden p-8 md:p-10">
-              {/* colorful corner glow */}
               <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-gradient-to-br from-brand-teal/20 to-[#f58a8c]/20 blur-2xl" />
               <div className="flex items-start gap-4">
                 <span className="mt-1 inline-grid h-8 w-8 place-items-center rounded-full bg-brand-teal/10 text-brand-teal">
@@ -452,7 +495,6 @@ function Testimonials() {
             </Card>
           </motion.div>
 
-          {/* Controls */}
           <div className="mt-6 flex items-center justify-between">
             <button
               aria-label="Previous testimonial"
@@ -536,7 +578,7 @@ function ImpactStats() {
 }
 
 /* =========================================
-   HOW IT WORKS — Vertical Timeline (animated progress, now gradient line)
+   HOW IT WORKS — Vertical Timeline (animated progress, gradient line)
 ========================================= */
 function HowItWorksTimeline() {
   const timelineRef = useRef<HTMLDivElement>(null)
@@ -583,10 +625,8 @@ function HowItWorksTimeline() {
         </motion.div>
 
         <div ref={timelineRef} className="relative mx-auto mt-10 grid max-w-3xl grid-cols-[24px_1fr] gap-x-4">
-          {/* Static track */}
           <div className="relative">
             <div className="absolute left-1/2 top-0 -translate-x-1/2 h-full w-[2px] bg-slate-200" />
-            {/* Animated gradient progress line */}
             <motion.div
               style={{ scaleY, transformOrigin: 'top' }}
               className="absolute left-1/2 top-0 -translate-x-1/2 h-full w-[2px] bg-gradient-to-b from-brand-teal to-[#f58a8c]"
@@ -604,14 +644,11 @@ function HowItWorksTimeline() {
                 className="relative"
               >
                 <div className="grid grid-cols-[24px_1fr] gap-x-4">
-                  {/* Node */}
                   <div className="relative z-10 flex items-start justify-center">
                     <div className="grid h-6 w-6 place-items-center rounded-full border border-brand-teal bg-white text-brand-teal shadow-sm">
                       {s.icon}
                     </div>
                   </div>
-
-                  {/* Card */}
                   <Card className="p-5">
                     <div className="flex items-center gap-2">
                       <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-brand-teal/10 text-brand-teal text-xs font-semibold">
