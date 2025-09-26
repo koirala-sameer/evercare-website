@@ -2,7 +2,7 @@ import { motion, useScroll, useTransform } from 'framer-motion'
 import { useRef } from 'react'
 import { ArrowRight, ShieldCheck, Heart, Phone, Clock, UserRoundCheck } from 'lucide-react'
 import Navbar from '../components/Navbar'
-import { Button, Card, Badge, GhostButton } from '../components/ui'
+import { Button, Card, GhostButton } from '../components/ui' // Badge removed to avoid prop mismatch
 import { Link } from 'react-router-dom'
 
 export default function Home() {
@@ -36,13 +36,14 @@ function Hero() {
     target: heroRef,
     offset: ['start end', 'end start'],
   })
-  // subtle parallax on the right visual + overlay
-  const imgY = useTransform(scrollYProgress, [0, 1], [0, -60])
-  const overlayY = useTransform(scrollYProgress, [0, 1], [0, -20])
+  // subtle parallax on the right visual + overlay (smoothed)
+  const imgY = useTransform(scrollYProgress, [0, 1], [0, -40])
+  const overlayY = useTransform(scrollYProgress, [0, 1], [0, -16])
 
   return (
     <section ref={heroRef} className="hero-gradient relative overflow-hidden">
-      <div className="pointer-events-none absolute inset-0 bg-[url('/banner-caregiver.jpg')] bg-cover bg-center opacity-15" />
+      {/* use valid Tailwind opacity scale for consistency across builds */}
+      <div className="pointer-events-none absolute inset-0 bg-[url('/banner-caregiver.jpg')] bg-cover bg-center opacity-10 md:opacity-20" />
       <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 px-6 py-24 md:grid-cols-2 md:py-32">
         <motion.div
           variants={staggerParent}
@@ -51,10 +52,10 @@ function Hero() {
           viewport={{ once: true, amount: 0.35 }}
         >
           <motion.div variants={fadeUp}>
-            {/* Badge in blushed coral for warmth */}
-            <Badge className="bg-[#f58a8c]/10 text-[#f58a8c]">
+            {/* Pill in blushed coral for warmth (replaces <Badge /> to avoid className typing error) */}
+            <span className="inline-block rounded-full bg-[#f58a8c]/10 px-3 py-1 text-sm font-medium text-[#f58a8c]">
               One Platform. Total Peace of Mind.
-            </Badge>
+            </span>
           </motion.div>
 
           <motion.h1
@@ -80,7 +81,7 @@ function Hero() {
                   bg-brand-teal text-white shadow-[0_10px_20px_rgba(97,191,192,0.35)]
                   hover:shadow-[0_16px_32px_rgba(97,191,192,0.45)] hover:translate-y-[-1px]
                   active:translate-y-[0px] active:shadow-[0_8px_16px_rgba(97,191,192,0.35)]
-                  transition-all duration-200
+                  transition-all duration-200 ease-out
                   focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-teal focus-visible:ring-offset-2
                   before:pointer-events-none before:absolute before:inset-0 before:rounded-[inherit]
                   before:bg-gradient-to-b before:from-white/25 before:to-white/0
@@ -95,9 +96,9 @@ function Hero() {
           </motion.div>
 
           <motion.div variants={fadeUp} className="mt-8 flex items-center gap-6 text-sm text-slate-600">
-            <span className="inline-flex items-center gap-2"><ShieldCheck className="h-5 w-5 text-brand-teal" /> 24/7 security</span>
-            <span className="inline-flex items-center gap-2"><Phone className="h-5 w-5 text-brand-teal" /> Real-time updates</span>
-            <span className="hidden items-center gap-2 md:inline-flex"><Clock className="h-5 w-5 text-brand-teal" /> Same-day requests</span>
+            <span className="inline-flex items-center gap-2"><ShieldCheck className="h-5 w-5 text-brand-teal/90" /> 24/7 security</span>
+            <span className="inline-flex items-center gap-2"><Phone className="h-5 w-5 text-brand-teal/90" /> Real-time updates</span>
+            <span className="hidden items-center gap-2 md:inline-flex"><Clock className="h-5 w-5 text-brand-teal/90" /> Same-day requests</span>
           </motion.div>
         </motion.div>
 
@@ -108,12 +109,15 @@ function Hero() {
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, ease: 'easeOut' }}
-            className="glass relative rounded-3xl p-6"
+            className="glass relative rounded-3xl p-6 will-change-transform"
           >
             <img
               src="/banner-caregiver.jpg"
               className="h-[420px] w-full rounded-2xl object-cover"
               alt="Caregiver with senior in a flower garden"
+              loading="eager"
+              decoding="async"
+              fetchPriority="high"
             />
             <motion.div
               style={{ y: overlayY }}
@@ -148,12 +152,26 @@ function TrustBar() {
         viewport={{ once: true, amount: 0.4 }}
       >
         {[
-          <><img src="/logo.png" className="h-6 w-6" alt="" /><span>Radical transparency</span></>,
-          <><UserRoundCheck className="h-5 w-5 text-brand-teal" /><span>Verified caregivers</span></>,
-          <><ShieldCheck className="h-5 w-5 text-brand-teal" /><span>Safety-first operations</span></>,
-          <><Clock className="h-5 w-5 text-brand-teal" /><span>Fast response</span></>,
+          <>
+            <img src="/logo.png" className="h-6 w-6" alt="" />
+            <span>Radical transparency</span>
+          </>,
+          <>
+            <UserRoundCheck className="h-5 w-5 text-brand-teal/90" />
+            <span>Verified caregivers</span>
+          </>,
+          <>
+            <ShieldCheck className="h-5 w-5 text-brand-teal/90" />
+            <span>Safety-first operations</span>
+          </>,
+          <>
+            <Clock className="h-5 w-5 text-brand-teal/90" />
+            <span>Fast response</span>
+          </>,
         ].map((content, i) => (
-          <motion.div key={i} variants={fadeUp} className="flex items-center gap-2" />
+          <motion.div key={i} variants={fadeUp} className="flex items-center gap-2">
+            {content}
+          </motion.div>
         ))}
       </motion.div>
     </section>
@@ -196,7 +214,7 @@ function StorySections() {
                   <motion.li
                     key={i}
                     variants={fadeUp}
-                    className="rounded-2xl border border-slate-200 bg-white p-4 transition hover:translate-y-[-2px] hover:shadow-md hover:bg-[#f58a8c]/5"
+                    className="rounded-2xl border border-slate-200 bg-white p-4 transition hover:-translate-y-0.5 hover:shadow-md hover:bg-[#f58a8c]/5"
                   >
                     {li}
                   </motion.li>
@@ -266,7 +284,7 @@ function Plans() {
                       bg-brand-teal text-white shadow-[0_10px_20px_rgba(97,191,192,0.35)]
                       hover:shadow-[0_16px_32px_rgba(97,191,192,0.45)] hover:translate-y-[-1px]
                       active:translate-y-[0px] active:shadow-[0_8px_16px_rgba(97,191,192,0.35)]
-                      transition-all duration-200
+                      transition-all duration-200 ease-out
                       focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-teal focus-visible:ring-offset-2
                       before:pointer-events-none before:absolute before:inset-0 before:rounded-[inherit]
                       before:bg-gradient-to-b before:from-white/25 before:to-white/0
@@ -297,8 +315,8 @@ function AlaCartePreview() {
           viewport={{ once: true, amount: 0.35 }}
         >
           {[
-            {icon: <ShieldCheck className="h-6 w-6 text-brand-teal" />, title: 'Safety-first', desc: '24/7 surveillance and proactive wellness checks.'},
-            {icon: <Phone className="h-6 w-6 text-brand-teal" />, title: 'Transparent', desc: 'Every visit and spend is tracked and shared with family.'},
+            {icon: <ShieldCheck className="h-6 w-6 text-brand-teal/90" />, title: 'Safety-first', desc: '24/7 surveillance and proactive wellness checks.'},
+            {icon: <Phone className="h-6 w-6 text-brand-teal/90" />, title: 'Transparent', desc: 'Every visit and spend is tracked and shared with family.'},
             {icon: <Heart className="h-6 w-6 text-[#f58a8c]" />, title: 'Compassionate', desc: 'We show up with heart, not just service lists.'},
           ].map((b, i) => (
             <motion.div key={i} variants={fadeUp} whileHover={{ y: -3 }} transition={{ duration: 0.2 }}>
@@ -351,7 +369,7 @@ function FAQ() {
               key={i}
               variants={fadeUp}
               className="group rounded-2xl border border-slate-200 bg-white p-5 transition
-                         open:shadow-soft hover:translate-y-[-1px]"
+                         open:shadow-soft hover:-translate-y-0.5"
             >
               <summary className="cursor-pointer list-none text-lg font-medium text-brand-ink">
                 {it.q}
