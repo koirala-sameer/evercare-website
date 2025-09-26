@@ -1,0 +1,35 @@
+/* Scroll snapping for storyboard-style frames */
+.storyboard-container {
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+.story-section {
+  position: relative;
+  color: white;
+}
+.theme-light {
+  color: #0f172a;
+}
+.theme-dark {
+  color: white;
+}
+/* Dark mode base */
+:root {
+  --bg: #ffffff;
+  --fg: #0f172a;
+}
+.dark {
+  --bg: #0b1220;
+  --fg: #f8fafc;
+  color-scheme: dark;
+}
+html, body, #root {
+  background: var(--bg);
+  color: var(--fg);
+}
+
+/* Utility */
+.text-balance {
+  text-wrap: balance;
+}
