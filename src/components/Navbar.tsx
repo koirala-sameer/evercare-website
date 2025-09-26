@@ -107,10 +107,7 @@ export default function Navbar() {
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 md:px-6">
         {/* Brand */}
         <Link to="/" className="flex items-center gap-3" onClick={() => setOpen(false)}>
-          <img src="/logo.png" alt="EverCare" className="h-8 w-8" />
-          <span className="hidden text-base font-semibold tracking-tight text-brand-ink sm:inline">
-            EverCare
-          </span>
+<img src="/logo.png" alt="EverCare logo" className="h-12 sm:h-14 md:h-16 w-auto shrink-0" />          
         </Link>
 
         {/* Desktop nav */}
