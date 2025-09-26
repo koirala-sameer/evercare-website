@@ -1,6 +1,6 @@
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { useRef, useEffect, useState } from 'react'
-import { ArrowRight, ShieldCheck, Heart, Phone, Clock, UserRoundCheck } from 'lucide-react'
+import { ArrowRight, ShieldCheck, Heart, Phone, Clock, UserRoundCheck, ChevronLeft, ChevronRight } from 'lucide-react'
 import Navbar from '../components/Navbar'
 import { Button, Card, GhostButton } from '../components/ui'
 import { Link } from 'react-router-dom'
@@ -14,6 +14,7 @@ export default function Home() {
       <MissionBlock />
       <NarrativeLine />
       <StorySections />
+      <Testimonials />
       <ImpactStats />
       <HowItWorksTimeline />
       <Plans />
@@ -104,7 +105,7 @@ function Hero() {
   const overlayY = useTransform(scrollYProgress, [0, 1], [0, -16])
 
   return (
-    <section ref={heroRef} className="hero-gradient relative overflow-hidden">
+    <section ref={heroRef} className="relative overflow-hidden bg-gradient-to-b from-white via-brand-cloud/40 to-white">
       <div className="pointer-events-none absolute inset-0 bg-[url('/banner-caregiver.jpg')] bg-cover bg-center opacity-10 md:opacity-20" />
       <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 px-6 py-24 md:grid-cols-2 md:py-32">
         <motion.div
@@ -114,16 +115,19 @@ function Hero() {
           viewport={{ once: true, amount: 0.35 }}
         >
           <motion.div variants={fadeUp}>
-            <span className="inline-block rounded-full bg-[#f58a8c]/10 px-3 py-1 text-sm font-medium text-[#f58a8c]">
+            <span className="inline-block rounded-full bg-[#f58a8c]/15 px-3 py-1 text-sm font-semibold text-[#f58a8c] ring-1 ring-[#f58a8c]/30">
               One Platform. Total Peace of Mind.
             </span>
           </motion.div>
 
           <motion.h1
             variants={fadeUp}
-            className="mt-5 text-[2.5rem] font-bold leading-[1.05] tracking-tight text-brand-ink md:text-6xl lg:text-7xl"
+            className="mt-5 text-[2.5rem] font-extrabold leading-[1.05] tracking-tight text-brand-ink md:text-6xl lg:text-7xl"
           >
-            Care for your parents <span className="text-brand-teal">as if you were here.</span>
+            Care for your parents{' '}
+            <span className="bg-gradient-to-r from-brand-teal to-[#f58a8c] bg-clip-text text-transparent">
+              as if you were here.
+            </span>
           </motion.h1>
 
           <motion.p
@@ -139,7 +143,7 @@ function Hero() {
               <Button
                 className="
                   relative inline-flex items-center gap-2 rounded-2xl px-6 py-3 text-base font-semibold
-                  bg-brand-teal text-white shadow-[0_10px_20px_rgba(97,191,192,0.35)]
+                  bg-gradient-to-r from-brand-teal to-[#6fd1d2] text-white shadow-[0_10px_20px_rgba(97,191,192,0.35)]
                   hover:shadow-[0_16px_32px_rgba(97,191,192,0.45)] hover:translate-y-[-1px]
                   active:translate-y-[0px] active:shadow-[0_8px_16px_rgba(97,191,192,0.35)]
                   transition-all duration-200 ease-out
@@ -152,7 +156,9 @@ function Hero() {
               </Button>
             </a>
             <a href="#plans">
-              <GhostButton>See plan</GhostButton>
+              <GhostButton className="rounded-2xl ring-1 ring-slate-200 hover:bg-brand-teal/10 hover:text-brand-teal">
+                See plan
+              </GhostButton>
             </a>
           </motion.div>
 
@@ -170,7 +176,7 @@ function Hero() {
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, ease: 'easeOut' }}
-            className="glass relative rounded-3xl p-6 will-change-transform"
+            className="glass relative rounded-3xl p-6 ring-1 ring-white/50 backdrop-blur will-change-transform"
           >
             <img
               src="/banner-caregiver.jpg"
@@ -310,7 +316,7 @@ function StorySections() {
     { title: 'Healthcare that comes home', text: 'Telemedicine, lab tests at home, and specialist coordination when needed.', img: '/banner-caregiver.jpg' },
   ]
   return (
-    <section id="services" className="bg-gradient-to-b from-white to-brand-cloud/60">
+    <section id="services" className="bg-gradient-to-b from-white via-brand-cloud/40 to-brand-cloud/60">
       <div className="mx-auto max-w-7xl space-y-20 px-6 py-24">
         {items.map((it, idx) => (
           <motion.div
@@ -348,6 +354,134 @@ function StorySections() {
             </div>
           </motion.div>
         ))}
+      </div>
+    </section>
+  )
+}
+
+/* =========================================
+   TESTIMONIALS — overlap fixed + vibrant accents
+   (No absolute stacking; single Card swaps content)
+========================================= */
+function Testimonials() {
+  const items = [
+    {
+      quote:
+        'The weekly wellness calls and photo updates eased my anxiety instantly. It feels like I’m right there with my mom.',
+      name: 'Aarav S.',
+      role: 'Son in Sydney',
+    },
+    {
+      quote:
+        'They set up a clear routine—meals, meds, and a gentle walk every evening. My father smiles more now.',
+      name: 'Prabina T.',
+      role: 'Daughter in Toronto',
+    },
+    {
+      quote:
+        'Transparent, punctual, compassionate. The dashboard updates keep our whole family aligned.',
+      name: 'Kiran & Maya',
+      role: 'Family in the US',
+    },
+  ]
+  const [idx, setIdx] = useState(0)
+  const [paused, setPaused] = useState(false)
+
+  useEffect(() => {
+    if (paused) return
+    const t = setInterval(() => setIdx((p) => (p + 1) % items.length), 6000)
+    return () => clearInterval(t)
+  }, [paused, items.length])
+
+  const prev = () => setIdx((p) => (p - 1 + items.length) % items.length)
+  const next = () => setIdx((p) => (p + 1) % items.length)
+
+  const active = items[idx]
+
+  return (
+    <section className="bg-gradient-to-b from-white via-[#f58a8c]/5 to-white">
+      <div className="mx-auto max-w-5xl px-6 py-16">
+        <motion.div
+          className="text-center"
+          variants={staggerParent}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.35 }}
+        >
+          <motion.h3 variants={fadeUp} className="text-3xl font-semibold tracking-tight text-brand-ink md:text-4xl">
+            What families say
+          </motion.h3>
+          <motion.p variants={fadeUp} className="mt-3 text-slate-700">
+            Real words from the diaspora caring for parents in Nepal.
+          </motion.p>
+        </motion.div>
+
+        <div
+          className="mx-auto mt-10 max-w-3xl"
+          onMouseEnter={() => setPaused(true)}
+          onMouseLeave={() => setPaused(false)}
+        >
+          {/* Single card that swaps content (no absolute layers) */}
+          <motion.div
+            key={idx}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.35, ease: 'easeOut' }}
+          >
+            <Card className="relative overflow-hidden p-8 md:p-10">
+              {/* colorful corner glow */}
+              <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-gradient-to-br from-brand-teal/20 to-[#f58a8c]/20 blur-2xl" />
+              <div className="flex items-start gap-4">
+                <span className="mt-1 inline-grid h-8 w-8 place-items-center rounded-full bg-brand-teal/10 text-brand-teal">
+                  “
+                </span>
+                <p className="text-xl leading-relaxed text-brand-ink md:text-2xl">
+                  {active.quote}
+                </p>
+              </div>
+              <div className="mt-6 flex items-center gap-3">
+                <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[#f58a8c]/10 text-sm font-semibold text-[#f58a8c]">
+                  {active.name.split(' ').map((s) => s[0]).join('').slice(0, 2)}
+                </div>
+                <div className="text-sm">
+                  <div className="font-medium text-brand-ink">{active.name}</div>
+                  <div className="text-slate-600">{active.role}</div>
+                </div>
+              </div>
+            </Card>
+          </motion.div>
+
+          {/* Controls */}
+          <div className="mt-6 flex items-center justify-between">
+            <button
+              aria-label="Previous testimonial"
+              onClick={prev}
+              className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-slate-700 transition hover:-translate-y-0.5 hover:shadow-md"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            <div className="flex items-center gap-2">
+              {items.map((_, i) => (
+                <button
+                  key={i}
+                  aria-label={`Go to testimonial ${i + 1}`}
+                  onClick={() => setIdx(i)}
+                  className={`h-2.5 w-2.5 rounded-full transition ${
+                    i === idx ? 'bg-gradient-to-r from-brand-teal to-[#f58a8c]' : 'bg-slate-300'
+                  }`}
+                />
+              ))}
+            </div>
+            <button
+              aria-label="Next testimonial"
+              onClick={next}
+              className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-slate-700 transition hover:-translate-y-0.5 hover:shadow-md"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </button>
+          </div>
+        </div>
       </div>
     </section>
   )
@@ -402,11 +536,10 @@ function ImpactStats() {
 }
 
 /* =========================================
-   HOW IT WORKS — Vertical Timeline (animated progress)
+   HOW IT WORKS — Vertical Timeline (animated progress, now gradient line)
 ========================================= */
 function HowItWorksTimeline() {
   const timelineRef = useRef<HTMLDivElement>(null)
-  // Animate the progress line when the section comes into view
   const { scrollYProgress } = useScroll({
     target: timelineRef,
     offset: ['start 80%', 'end 20%'],
@@ -453,10 +586,10 @@ function HowItWorksTimeline() {
           {/* Static track */}
           <div className="relative">
             <div className="absolute left-1/2 top-0 -translate-x-1/2 h-full w-[2px] bg-slate-200" />
-            {/* Animated progress line */}
+            {/* Animated gradient progress line */}
             <motion.div
               style={{ scaleY, transformOrigin: 'top' }}
-              className="absolute left-1/2 top-0 -translate-x-1/2 h-full w-[2px] bg-brand-teal"
+              className="absolute left-1/2 top-0 -translate-x-1/2 h-full w-[2px] bg-gradient-to-b from-brand-teal to-[#f58a8c]"
             />
           </div>
 
@@ -550,13 +683,11 @@ function Plans() {
                   <Button
                     className="
                       relative rounded-2xl px-6 py-3 text-base font-semibold
-                      bg-brand-teal text-white shadow-[0_10px_20px_rgba(97,191,192,0.35)]
+                      bg-gradient-to-r from-brand-teal to-[#6fd1d2] text-white shadow-[0_10px_20px_rgba(97,191,192,0.35)]
                       hover:shadow-[0_16px_32px_rgba(97,191,192,0.45)] hover:translate-y-[-1px]
                       active:translate-y-[0px] active:shadow-[0_8px_16px_rgba(97,191,192,0.35)]
                       transition-all duration-200 ease-out
                       focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-teal focus-visible:ring-offset-2
-                      before:pointer-events-none before:absolute before:inset-0 before:rounded-[inherit]
-                      before:bg-gradient-to-b before:from-white/25 before:to-white/0
                     "
                   >
                     Proceed to Add-Ons
@@ -574,7 +705,7 @@ function Plans() {
 
 function AddOnsShowcase() {
   return (
-    <section id="addons" className="bg-[#f58a8c]/5">
+    <section id="addons" className="bg-gradient-to-b from-[#f58a8c]/10 via-white to-white">
       <div className="mx-auto max-w-7xl px-6 py-24">
         <motion.div
           className="mx-auto max-w-2xl text-center"
@@ -622,7 +753,9 @@ function AddOnsShowcase() {
 
         <div className="mt-10 text-center">
           <Link to="/enroll">
-            <Button className="rounded-2xl px-6 py-3">Customize & Enroll</Button>
+            <Button className="rounded-2xl px-6 py-3 bg-gradient-to-r from-brand-teal to-[#6fd1d2]">
+              Customize & Enroll
+            </Button>
           </Link>
         </div>
       </div>
@@ -706,12 +839,14 @@ function FinalCTA() {
             className="mt-4 flex flex-wrap justify-center gap-3"
           >
             <Link to="/enroll">
-              <Button className="rounded-2xl px-6 py-3">
+              <Button className="rounded-2xl px-6 py-3 bg-gradient-to-r from-brand-teal to-[#6fd1d2]">
                 Get started <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
             <a href="#plans">
-              <GhostButton className="rounded-2xl px-6 py-3">See what’s included</GhostButton>
+              <GhostButton className="rounded-2xl px-6 py-3 ring-1 ring-slate-200 hover:bg-[#f58a8c]/10 hover:text-[#f58a8c]">
+                See what’s included
+              </GhostButton>
             </a>
           </motion.div>
         </motion.div>
