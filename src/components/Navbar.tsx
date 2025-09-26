@@ -1,26 +1,27 @@
-import { Link, NavLink, useLocation } from 'react-router-dom'
-import { useEffect, useRef, useState, useCallback } from 'react'
-import { Button } from './ui'
-import PromoBanner from './PromoBanner'
+// src/components/Navbar.tsx
+import { useEffect, useRef, useState, MouseEvent } from 'react'
+import { Link, useLocation } from 'react-router-dom'
+import { Menu, X } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+
+type NavItem = { label: string; href: string; id?: string }
+
+const NAV_ITEMS: NavItem[] = [
+  { label: 'Services', href: '#services', id: 'services' },
+  { label: 'How it works', href: '#plans', id: 'plans' }, // "How it works" sits above plans timeline/section
+  { label: 'Add-Ons', href: '#addons', id: 'addons' },
+  { label: 'FAQ', href: '#faq', id: 'faq' },
+]
 
 export default function Navbar() {
-  const { pathname, hash } = useLocation()
-  const isHome = pathname === '/'
   const [scrolled, setScrolled] = useState(false)
-  const [mobileOpen, setMobileOpen] = useState(false)
+  const [open, setOpen] = useState(false)
+  const [activeId, setActiveId] = useState<string | null>(null)
+  const location = useLocation()
+  const observerRef = useRef<IntersectionObserver | null>(null)
+  const headerRef = useRef<HTMLElement | null>(null)
 
-  // --- Simple debounce to avoid double scrolls ---
-  const debounceRef = useRef<number | null>(null)
-  const debounce = (fn: () => void, delay = 60) => {
-    if (debounceRef.current) window.clearTimeout(debounceRef.current)
-    debounceRef.current = window.setTimeout(() => {
-      fn()
-      debounceRef.current = null
-    }, delay)
-  }
-
-  /** ---------- Effects ---------- */
-  // Header shadow on scroll
+  // --- Sticky styles on scroll
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8)
     onScroll()
@@ -28,231 +29,179 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  // Close mobile on route/hash change
-  useEffect(() => {
-    setMobileOpen(false)
-  }, [pathname, hash])
+  // --- Utility: smooth scroll with sticky-navbar offset
+  const scrollWithOffset = (id: string, behavior: ScrollBehavior = 'smooth') => {
+    const el = document.getElementById(id)
+    if (!el) return
+    const headerH = (headerRef.current?.offsetHeight ?? 0) + 12 // add a little breathing room
+    const y = el.getBoundingClientRect().top + window.scrollY - headerH
+    window.scrollTo({ top: y, behavior })
+  }
 
-  // Prevent body scroll when mobile menu is open
-  useEffect(() => {
-    document.body.style.overflow = mobileOpen ? 'hidden' : ''
-  }, [mobileOpen])
-
-  // When arriving on Home with a hash (e.g., /#plans), scroll to it
-  useEffect(() => {
-    if (isHome && hash) {
-      const id = hash.replace('#', '')
-      debounce(() => {
-        const el = document.getElementById(id)
-        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
-      }, 80)
+  // --- Handle clicking nav anchors (desktop + mobile)
+  const handleAnchorClick = (e: MouseEvent<HTMLAnchorElement>, id?: string) => {
+    if (!id) return
+    e.preventDefault()
+    setOpen(false)
+    // update URL hash without jumping
+    if (history.pushState) {
+      const url = id ? `#${id}` : '#'
+      history.pushState(null, '', url)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isHome, hash])
+    scrollWithOffset(id)
+  }
 
-  /** ---------- Helpers ---------- */
-  const gotoAnchor = useCallback(
-    (id: string) => {
-      if (isHome) {
-        debounce(() => {
-          const el = document.getElementById(id)
-          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
-        }, 60)
-      } else {
-        // Navigate to Home with hash; then scroll after load via the effect above
-        window.location.href = `/#${id}`
+  // --- Active link highlighting based on visible section
+  useEffect(() => {
+    if (observerRef.current) {
+      observerRef.current.disconnect()
+      observerRef.current = null
+    }
+
+    const sections = NAV_ITEMS
+      .map((n) => n.id)
+      .filter(Boolean)
+      .map((id) => document.getElementById(id!))
+      .filter((el): el is HTMLElement => !!el)
+
+    if (sections.length === 0) return
+
+    const obs = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)
+        if (visible[0]) setActiveId(visible[0].target.id)
+      },
+      {
+        root: null,
+        rootMargin: '0px 0px -55% 0px', // earlier trigger so the pill feels snappy
+        threshold: [0, 0.25, 0.5, 0.75, 1],
       }
-    },
-    [isHome]
-  )
+    )
 
-  const handleAnchorClick =
-    (id: string) =>
-    (e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>) => {
-      e.preventDefault()
-      gotoAnchor(id)
-      setMobileOpen(false)
-    }
+    sections.forEach((sec) => obs.observe(sec))
+    observerRef.current = obs
+    return () => obs.disconnect()
+  }, [location.pathname])
+
+  // --- On first load or when hash changes (e.g., direct link), scroll with offset
+  useEffect(() => {
+    const hash = window.location.hash?.replace('#', '')
+    if (!hash) return
+    // wait one tick to ensure layout is ready
+    const t = setTimeout(() => scrollWithOffset(hash, 'auto'), 0)
+    return () => clearTimeout(t)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.pathname])
 
   return (
-    <>
-      {/* Promo banner above the header */}
-      <PromoBanner
-        theme="teal"
-        message="🎉 Limited launch: Get your first month 20% off. Use code EVERCARE20 during enrollment today."
-      />
+    <header
+      ref={headerRef as any}
+      className={[
+        'sticky top-0 z-50 w-full transition',
+        'supports-[backdrop-filter]:backdrop-blur',
+        scrolled ? 'bg-white/70 border-b border-slate-200 shadow-[0_2px_20px_rgba(15,23,42,0.06)]' : 'bg-white/40',
+      ].join(' ')}
+    >
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 md:px-6">
+        {/* Brand */}
+        <Link to="/" className="flex items-center gap-3" onClick={() => setOpen(false)}>
+          <img src="/logo.png" alt="EverCare" className="h-8 w-8" />
+          <span className="hidden text-base font-semibold tracking-tight text-brand-ink sm:inline">
+            EverCare
+          </span>
+        </Link>
 
-      <header
-        className={`sticky top-0 z-50 w-full transition-all duration-300 ${
-          scrolled ? 'bg-white/95 shadow-md' : 'bg-white/90 shadow-sm'
-        } backdrop-blur`}
-      >
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2">
-          {/* Logo */}
-          <Link to="/" className="flex items-center">
-            <img
-              src="/logo.png"
-              alt="EverCare logo"
-              className="h-20 w-auto shrink-0 -my-2"
-            />
-          </Link>
-
-          {/* Desktop nav */}
-          <nav className="hidden items-center gap-6 md:flex">
-            <NavLink
-              to="/"
-              className={({ isActive }) =>
-                `text-sm ${isActive ? 'text-slate-900' : 'text-slate-600 hover:text-slate-900'}`
-              }
-            >
-              Home
-            </NavLink>
-
-            {/* Smooth-scroll anchors */}
-            <a
-              href="#services"
-              onClick={handleAnchorClick('services')}
-              className="text-sm text-slate-600 hover:text-slate-900"
-            >
-              Services
-            </a>
-            <a
-              href="#plans"
-              onClick={handleAnchorClick('plans')}
-              className="text-sm text-slate-600 hover:text-slate-900"
-            >
-              Plan
-            </a>
-            <a
-              href="#faq"
-              onClick={handleAnchorClick('faq')}
-              className="text-sm text-slate-600 hover:text-slate-900"
-            >
-              FAQ
-            </a>
-            <a
-              href="#contact"
-              onClick={handleAnchorClick('contact')}
-              className="text-sm text-slate-600 hover:text-slate-900"
-            >
-              Contact
-            </a>
-          </nav>
-
-          {/* CTA + Mobile toggle */}
-          <div className="flex items-center gap-3">
-            {/* Enroll now scrolls to the Plan section on Home */}
-            <Button
-              className="hidden md:inline-flex rounded-2xl bg-brand-teal px-5 py-2.5 text-sm font-semibold text-white shadow-soft hover:shadow-lg active:translate-y-0"
-              onClick={handleAnchorClick('plans')}
+        {/* Desktop nav */}
+        <nav className="hidden items-center gap-1 md:flex">
+          {NAV_ITEMS.map((item) => {
+            const isActive = activeId === item.id
+            return (
+              <a
+                key={item.href}
+                href={item.href}
+                onClick={(e) => handleAnchorClick(e, item.id)}
+                className="relative rounded-xl px-3 py-2 text-sm font-medium text-slate-700 transition hover:text-brand-teal"
+              >
+                <span className="relative z-10">{item.label}</span>
+                <AnimatePresence>
+                  {isActive && (
+                    <motion.span
+                      layoutId="nav-active-pill"
+                      className="absolute inset-0 z-0 rounded-xl bg-brand-teal/10"
+                      transition={{ type: 'spring', stiffness: 500, damping: 40 }}
+                    />
+                  )}
+                </AnimatePresence>
+              </a>
+            )
+          })}
+          <Link to="/enroll" className="ml-2">
+            <span
+              className={[
+                'inline-flex items-center rounded-xl px-3 py-2 text-sm font-semibold',
+                'bg-brand-teal text-white',
+                'shadow-[0_8px_16px_rgba(97,191,192,0.28)] hover:shadow-[0_12px_24px_rgba(97,191,192,0.35)]',
+                'transition hover:-translate-y-0.5',
+              ].join(' ')}
             >
               Enroll
-            </Button>
+            </span>
+          </Link>
+        </nav>
 
-            <button
-              className="md:hidden inline-flex items-center justify-center rounded-lg p-2 text-slate-600 hover:bg-slate-100"
-              aria-expanded={mobileOpen}
-              aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
-              onClick={() => setMobileOpen((v) => !v)}
-            >
-              <span className="sr-only">{mobileOpen ? 'Close menu' : 'Open menu'}</span>
-              {mobileOpen ? (
-                // X icon
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              ) : (
-                // Hamburger
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 6h18M3 12h18M3 18h18" />
-                </svg>
-              )}
-            </button>
-          </div>
-        </div>
+        {/* Mobile toggler */}
+        <button
+          className="inline-flex items-center justify-center rounded-xl p-2 ring-1 ring-slate-200 md:hidden"
+          onClick={() => setOpen((s) => !s)}
+          aria-label="Toggle menu"
+        >
+          {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+        </button>
+      </div>
 
-        {/* Mobile slide-over menu */}
-        <div className={`md:hidden fixed inset-0 z-[60] ${mobileOpen ? 'pointer-events-auto' : 'pointer-events-none'}`}>
-          {/* Backdrop */}
-          <div
-            className={`absolute inset-0 transition ${mobileOpen ? 'bg-black/40 opacity-100' : 'opacity-0'}`}
-            onClick={() => setMobileOpen(false)}
-            aria-hidden="true"
-          />
-          {/* Panel */}
-          <div
-            className={`absolute left-0 top-0 h-full w-80 bg-white shadow-xl transition-transform duration-300 ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}`}
+      {/* Mobile menu */}
+      <AnimatePresence>
+        {open && (
+          <motion.nav
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.18, ease: 'easeOut' }}
+            className="border-t border-slate-200 bg-white/85 px-4 py-3 md:hidden"
           >
-            <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200">
-              <Link to="/" className="flex items-center gap-2" onClick={() => setMobileOpen(false)}>
-                <img src="/logo.png" alt="EverCare" className="h-12 w-auto" />
-              </Link>
-              <button
-                className="rounded-lg p-2 text-slate-600 hover:bg-slate-100"
-                onClick={() => setMobileOpen(false)}
-                aria-label="Close menu"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-
-            <nav className="flex flex-col gap-1 p-3">
-              <NavLink
-                to="/"
-                onClick={() => setMobileOpen(false)}
-                className="rounded-lg px-3 py-2 text-slate-700 hover:bg-slate-50"
-              >
-                Home
-              </NavLink>
-              <a
-                href="#services"
-                onClick={handleAnchorClick('services')}
-                className="rounded-lg px-3 py-2 text-slate-700 hover:bg-slate-50"
-              >
-                Services
-              </a>
-              <a
-                href="#plans"
-                onClick={handleAnchorClick('plans')}
-                className="rounded-lg px-3 py-2 text-slate-700 hover:bg-slate-50"
-              >
-                Plan
-              </a>
-              <a
-                href="#faq"
-                onClick={handleAnchorClick('faq')}
-                className="rounded-lg px-3 py-2 text-slate-700 hover:bg-slate-50"
-              >
-                FAQ
-              </a>
-              <a
-                href="#contact"
-                onClick={handleAnchorClick('contact')}
-                className="rounded-lg px-3 py-2 text-slate-700 hover:bg-slate-50"
-              >
-                Contact
-              </a>
-              {/* Enroll goes to the plan section */}
-              <button
-                onClick={handleAnchorClick('plans')}
-                className="mt-2 rounded-xl bg-brand-teal px-3 py-2 text-sm font-semibold text-white shadow-soft"
-              >
-                Enroll
-              </button>
-            </nav>
-          </div>
-        </div>
-
-        {/* Sub-bar when not on Home */}
-        {!isHome && (
-          <div className="w-full border-t border-slate-200 bg-slate-50 px-4 py-2 text-center text-sm text-slate-600">
-            You’re viewing the enrollment flow.{' '}
-            <a href="/#plans" className="text-brand-teal underline">Back to plan</a>
-          </div>
+            <ul className="space-y-1">
+              {NAV_ITEMS.map((item) => {
+                const isActive = activeId === item.id
+                return (
+                  <li key={item.href}>
+                    <a
+                      href={item.href}
+                      onClick={(e) => handleAnchorClick(e, item.id)}
+                      className={[
+                        'block rounded-xl px-3 py-2 text-sm font-medium',
+                        isActive ? 'bg-brand-teal/10 text-brand-teal' : 'text-slate-700',
+                      ].join(' ')}
+                    >
+                      {item.label}
+                    </a>
+                  </li>
+                )
+              })}
+              <li className="pt-1">
+                <Link
+                  to="/enroll"
+                  onClick={() => setOpen(false)}
+                  className="block rounded-xl bg-brand-teal px-3 py-2 text-center text-sm font-semibold text-white"
+                >
+                  Enroll
+                </Link>
+              </li>
+            </ul>
+          </motion.nav>
         )}
-      </header>
-    </>
+      </AnimatePresence>
+    </header>
   )
 }
