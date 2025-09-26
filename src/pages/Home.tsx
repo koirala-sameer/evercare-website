@@ -11,6 +11,8 @@ export default function Home() {
       <Navbar />
       <Hero />
       <TrustBar />
+      <MissionBlock />
+      <NarrativeLine />
       <StorySections />
       <ImpactStats />
       <Plans />
@@ -31,11 +33,11 @@ const fadeUp = {
   show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
 }
 
-/** ---------- AnimatedNumber (self-contained, no extra deps) ---------- */
+/** ---------- AnimatedNumber ---------- */
 type AnimatedNumberProps = {
   to: number
   from?: number
-  duration?: number // seconds
+  duration?: number
   prefix?: string
   suffix?: string
   className?: string
@@ -66,7 +68,7 @@ function AnimatedNumber({
           const start = performance.now()
           const tick = (now: number) => {
             const t = Math.min((now - start) / (duration * 1000), 1)
-            const ease = 1 - Math.pow(1 - t, 3) // easeOutCubic
+            const ease = 1 - Math.pow(1 - t, 3)
             const current = from + (to - from) * ease
             setVal(current)
             if (t < 1) requestAnimationFrame(tick)
@@ -96,13 +98,11 @@ function Hero() {
     target: heroRef,
     offset: ['start end', 'end start'],
   })
-  // subtle parallax on the right visual + overlay (smoothed)
   const imgY = useTransform(scrollYProgress, [0, 1], [0, -40])
   const overlayY = useTransform(scrollYProgress, [0, 1], [0, -16])
 
   return (
     <section ref={heroRef} className="hero-gradient relative overflow-hidden">
-      {/* background image with valid tailwind opacity scale */}
       <div className="pointer-events-none absolute inset-0 bg-[url('/banner-caregiver.jpg')] bg-cover bg-center opacity-10 md:opacity-20" />
       <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 px-6 py-24 md:grid-cols-2 md:py-32">
         <motion.div
@@ -112,7 +112,6 @@ function Hero() {
           viewport={{ once: true, amount: 0.35 }}
         >
           <motion.div variants={fadeUp}>
-            {/* pill (instead of Badge) for compatibility */}
             <span className="inline-block rounded-full bg-[#f58a8c]/10 px-3 py-1 text-sm font-medium text-[#f58a8c]">
               One Platform. Total Peace of Mind.
             </span>
@@ -134,7 +133,6 @@ function Hero() {
           </motion.p>
 
           <motion.div variants={fadeUp} className="mt-8 flex flex-wrap gap-4">
-            {/* Both CTAs scroll to the plan section */}
             <a href="#plans">
               <Button
                 className="
@@ -185,7 +183,6 @@ function Hero() {
               className="absolute -bottom-6 left-6 right-6 rounded-2xl border border-slate-200 bg-white p-4 shadow-soft"
             >
               <div className="flex items-center gap-3">
-                {/* Heart in coral */}
                 <div className="grid h-10 w-10 place-items-center rounded-xl bg-[#f58a8c]/10">
                   <Heart className="h-5 w-5 text-[#f58a8c]" />
                 </div>
@@ -235,6 +232,71 @@ function TrustBar() {
           </motion.div>
         ))}
       </motion.div>
+    </section>
+  )
+}
+
+function MissionBlock() {
+  return (
+    <section className="bg-white">
+      <div className="mx-auto max-w-5xl px-6 py-20">
+        <motion.div
+          className="rounded-3xl border border-slate-200 bg-white/70 p-8 md:p-12 shadow-soft backdrop-blur"
+          variants={staggerParent}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.35 }}
+        >
+          <motion.div variants={fadeUp} className="flex items-start gap-4">
+            <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-brand-teal/10">
+              <Heart className="h-6 w-6 text-brand-teal/90" />
+            </div>
+            <div>
+              <p className="text-xl leading-relaxed text-brand-ink md:text-2xl">
+                <em>
+                  “Families abroad shouldn’t worry every night. We built EverCare so parents in Nepal
+                  live with dignity, safety, and joy—while you see everything clearly from anywhere.”
+                </em>
+              </p>
+              <div className="mt-4 text-sm text-slate-600">— The EverCare Team</div>
+            </div>
+          </motion.div>
+
+          <motion.div variants={fadeUp} className="mt-8 grid gap-4 md:grid-cols-3">
+            <div className="rounded-2xl border border-slate-200 bg-white p-4">
+              <p className="text-sm font-medium text-brand-ink">Compassion, measured</p>
+              <p className="mt-1 text-sm text-slate-700">Care that shows up—on time, with heart, and with proof.</p>
+            </div>
+            <div className="rounded-2xl border border-slate-200 bg-white p-4">
+              <p className="text-sm font-medium text-brand-ink">Transparency, always</p>
+              <p className="mt-1 text-sm text-slate-700">Every visit, every rupee, visible to the family dashboard.</p>
+            </div>
+            <div className="rounded-2xl border border-slate-200 bg-white p-4">
+              <p className="text-sm font-medium text-brand-ink">Care that scales</p>
+              <p className="mt-1 text-sm text-slate-700">Start simple, add specialists only when needed.</p>
+            </div>
+          </motion.div>
+        </motion.div>
+      </div>
+    </section>
+  )
+}
+
+/* Slim narrative line (replaces the collage section) */
+function NarrativeLine() {
+  return (
+    <section className="bg-white">
+      <div className="mx-auto max-w-5xl px-6 pb-10 -mt-6">
+        <motion.p
+          variants={staggerParent}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.5 }}
+          className="text-center text-slate-700"
+        >
+          Real moments — from meals to medicine to meaningful time outside.
+        </motion.p>
+      </div>
     </section>
   )
 }
@@ -289,10 +351,6 @@ function StorySections() {
   )
 }
 
-/* =========================================
-   IMPACT STATS — animated counters
-   (Drop-in, no new deps, uses IntersectionObserver)
-========================================= */
 function ImpactStats() {
   return (
     <section className="bg-white">
@@ -341,7 +399,6 @@ function ImpactStats() {
   )
 }
 
-/** SINGLE PLAN + ADD-ONS MODEL */
 function Plans() {
   return (
     <section id="plans" className="relative">
@@ -416,7 +473,6 @@ function Plans() {
   )
 }
 
-/** Popular Add-Ons grid (non-interactive showcase) */
 function AddOnsShowcase() {
   return (
     <section id="addons" className="bg-[#f58a8c]/5">
