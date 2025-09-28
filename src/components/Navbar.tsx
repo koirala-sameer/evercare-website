@@ -1,4 +1,3 @@
-// src/components/Navbar.tsx
 import { useEffect, useRef, useState, MouseEvent } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { Menu, X } from 'lucide-react'
@@ -14,8 +13,6 @@ const NAV_ITEMS: NavItem[] = [
   { label: 'FAQ', href: '#faq', id: 'faq' },
 ]
 
-// You can keep this pointing to your real logo asset.
-// There's a runtime fallback to /logo.png if /logo.svg isn't found.
 const LOGO_SRC = '/logo.svg'
 
 export default function Navbar() {
@@ -63,24 +60,17 @@ export default function Navbar() {
       return
     }
     const ids = NAV_ITEMS.map((n) => n.id).filter(Boolean) as string[]
-    const sections = ids
-      .map((id) => document.getElementById(id))
-      .filter(Boolean) as HTMLElement[]
-
+    const sections = ids.map((id) => document.getElementById(id)).filter(Boolean) as HTMLElement[]
     if (!sections.length) return
 
     const observer = new IntersectionObserver(
       (entries) => {
-        // Pick the most visible / nearest to top
         const visible = entries
           .filter((e) => e.isIntersecting)
           .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)
         if (visible[0]?.target?.id) setActiveId(visible[0].target.id)
       },
-      {
-        rootMargin: '-40% 0px -55% 0px', // feel free to tweak
-        threshold: [0, 0.2, 0.5, 1],
-      }
+      { rootMargin: '-40% 0px -55% 0px', threshold: [0, 0.2, 0.5, 1] }
     )
     observerRef.current = observer
     sections.forEach((s) => observer.observe(s))
@@ -117,15 +107,12 @@ export default function Navbar() {
       ref={headerRef as any}
       className={[
         'sticky top-0 z-50 w-full transition-colors',
-        // higher contrast base, slightly more opaque when scrolled
         scrolled
           ? 'bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/85 shadow-md'
           : 'bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/80 shadow-sm',
-        // crisp under-border for separation
         'border-b border-slate-200',
       ].join(' ')}
     >
-      {/* Promo banner */}
       <PromoBanner
         theme="teal"
         message="Father’s Day Special: First month 15% off on Premium Care • Limited time"
@@ -133,12 +120,7 @@ export default function Navbar() {
 
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 md:px-6">
         {/* Brand */}
-        <Link
-          to="/"
-          className="flex items-center gap-3"
-          onClick={() => setOpen(false)}
-          aria-label="EverCare home"
-        >
+        <Link to="/" className="flex items-center gap-3" onClick={() => setOpen(false)} aria-label="EverCare home">
           <img
             src={LOGO_SRC}
             alt="EverCare logo"
@@ -165,18 +147,10 @@ export default function Navbar() {
                     data-active={isActive ? 'true' : undefined}
                     aria-current={isActive ? 'page' : undefined}
                     className={[
-                      // higher-contrast base text, slightly larger tracking
                       'inline-flex items-center rounded-xl px-3 py-2 text-[15px] font-medium',
-                      'text-slate-900',
-                      // clear hover with strong contrast (dark text on light chip)
-                      'hover:bg-slate-100',
-                      // active = filled dark for maximum contrast
+                      'text-slate-900 hover:text-slate-950 hover:bg-slate-100',
                       'data-[active=true]:bg-slate-900 data-[active=true]:text-white',
-                      // underline accent when not filled
-                      'data-[active=true]:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)]',
-                      // keyboard focus ring (brand)
                       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-teal/60 focus-visible:ring-offset-2 focus-visible:ring-offset-white',
-                      // motion polish
                       'transition-colors',
                     ].join(' ')}
                   >
@@ -187,16 +161,13 @@ export default function Navbar() {
             })}
           </ul>
 
-          {/* Divider */}
           <span className="mx-2 h-6 w-px bg-slate-200" aria-hidden />
 
-          {/* Enroll CTA — keep as is, but slightly stronger hover/contrast */}
           <Link
             to="/enroll"
             className={[
               'inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm font-semibold',
-              'bg-brand-teal text-white shadow-sm',
-              'hover:brightness-95 active:brightness-90',
+              'bg-brand-teal text-white shadow-sm hover:brightness-95 active:brightness-90',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-teal/60 focus-visible:ring-offset-2 focus-visible:ring-offset-white',
               'transition',
             ].join(' ')}
@@ -205,7 +176,7 @@ export default function Navbar() {
           </Link>
         </nav>
 
-        {/* Mobile: menu button only (unchanged logic, higher-contrast ring) */}
+        {/* Mobile menu button */}
         <div className="md:hidden flex items-center gap-2">
           <button
             ref={menuButtonRef}
@@ -244,8 +215,7 @@ export default function Navbar() {
                       aria-current={isActive ? 'page' : undefined}
                       className={[
                         'block rounded-lg px-3 py-2.5 text-[15px] font-medium',
-                        'text-slate-900',
-                        'hover:bg-slate-100',
+                        'text-slate-900 hover:text-slate-950 hover:bg-slate-100',
                         'data-[active=true]:bg-slate-900 data-[active=true]:text-white',
                         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-teal/60',
                         'transition-colors',
