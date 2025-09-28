@@ -14,12 +14,25 @@ const NAV_ITEMS: NavItem[] = [
   { label: 'FAQ', href: '#faq', id: 'faq' },
 ]
 
-// Replace with your official WhatsApp number (keep country code)
-const WHATSAPP_LINK =
-  'https://wa.me/9779800000000?text=Hello%20EverCare%20%E2%80%94%20I%27d%20like%20to%20learn%20more'
+// ---- Helpers ----
 
-// Build a base-aware path for /public assets (works in subfolders like /evercare-website/)
+// Base-aware path for /public assets (works on subpaths e.g. /evercare-website/)
 const publicAsset = (p: string) => `${import.meta.env.BASE_URL}${p.replace(/^\/+/, '')}`
+
+// Sanitize any phone string to digits only (WhatsApp expects E.164 digits)
+const digitsOnly = (s: string) => (s || '').replace(/\D+/g, '')
+
+// Brand & WhatsApp phone via env with safe fallbacks
+const BRAND_NAME = (import.meta.env.VITE_BRAND_NAME as string) || 'EverCare Nepal'
+const WA_PHONE_RAW = (import.meta.env.VITE_WHATSAPP_PHONE as string) || '9779800000000'
+const WA_PHONE = digitsOnly(WA_PHONE_RAW)
+
+// Prefill message (URL-encoded)
+const PREFILL_MESSAGE = encodeURIComponent(`Hello ${BRAND_NAME} — I’d like to learn more.`)
+
+// Final WhatsApp link
+const WHATSAPP_LINK = `https://wa.me/${WA_PHONE}?text=${PREFILL_MESSAGE}`
+
 const LOGO_SRC = publicAsset('logo.png')
 
 export default function Navbar() {
@@ -161,6 +174,7 @@ export default function Navbar() {
                     href={item.href}
                     onClick={(e) => handleAnchorClick(e, item.id)}
                     className="relative rounded-xl px-3 py-2 text-sm font-medium text-slate-700 transition hover:text-brand-teal"
+                    aria-current={isActive ? 'page' : undefined}
                   >
                     <span className="relative z-10">{item.label}</span>
                     <AnimatePresence>
@@ -241,6 +255,7 @@ export default function Navbar() {
                         'block rounded-xl px-3 py-2 text-sm font-medium',
                         isActive ? 'bg-brand-teal/10 text-brand-teal' : 'text-slate-700',
                       ].join(' ')}
+                      aria-current={isActive ? 'page' : undefined}
                     >
                       {item.label}
                     </a>
