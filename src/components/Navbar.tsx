@@ -18,6 +18,10 @@ const NAV_ITEMS: NavItem[] = [
 const WHATSAPP_LINK =
   'https://wa.me/9779800000000?text=Hello%20EverCare%20%E2%80%94%20I%27d%20like%20to%20learn%20more'
 
+// Build a base-aware path for /public assets (works in subfolders like /evercare-website/)
+const publicAsset = (p: string) => `${import.meta.env.BASE_URL}${p.replace(/^\/+/, '')}`
+const LOGO_SRC = publicAsset('logo.png')
+
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
@@ -50,7 +54,6 @@ export default function Navbar() {
     if (!id) return
     e.preventDefault()
     setOpen(false)
-    // update URL hash without jump
     if (history.pushState) {
       const url = id ? `#${id}` : '#'
       history.pushState(null, '', url)
@@ -133,7 +136,18 @@ export default function Navbar() {
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 md:px-6">
         {/* Brand */}
         <Link to="/" className="flex items-center gap-3" onClick={() => setOpen(false)} aria-label="EverCare home">
-          <img src="/logo.png" alt="EverCare logo" className="h-12 sm:h-14 md:h-16 w-auto shrink-0" />
+          <img
+            src={LOGO_SRC}
+            alt="EverCare logo"
+            className="h-12 sm:h-14 md:h-16 w-auto shrink-0"
+            decoding="async"
+            fetchPriority="high"
+            onError={(e) => {
+              // Fallback if base-aware path fails (e.g., missing file or dev mispath)
+              const img = e.currentTarget as HTMLImageElement
+              if (img.src !== '/logo.png') img.src = '/logo.png'
+            }}
+          />
         </Link>
 
         {/* Desktop nav */}
