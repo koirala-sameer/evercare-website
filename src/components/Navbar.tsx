@@ -1,204 +1,236 @@
-// src/components/Navbar.tsx
-import { useEffect, useRef, useState, MouseEvent } from 'react'
-import { Link, useLocation } from 'react-router-dom'
-import { Menu, X } from 'lucide-react'
-import { motion, AnimatePresence } from 'framer-motion'
+import React, { useEffect, useRef, useState } from 'react';
+import PromoBanner from './PromoBanner';
 
-type NavItem = { label: string; href: string; id?: string }
+type NavLink = {
+  label: string;
+  href: string;
+};
 
-const NAV_ITEMS: NavItem[] = [
-  { label: 'Services', href: '#services', id: 'services' },
-  { label: 'How it works', href: '#plans', id: 'plans' }, // "How it works" sits above plans timeline/section
-  { label: 'Add-Ons', href: '#addons', id: 'addons' },
-  { label: 'FAQ', href: '#faq', id: 'faq' },
-]
+const NAV_LINKS: NavLink[] = [
+  { label: 'Services', href: '/services' },
+  { label: 'Plans', href: '/plans' },
+  { label: 'About', href: '/about' },
+  { label: 'Contact', href: '/contact' },
+];
+
+const PHONE_NUMBER_DISPLAY = '+977 980-0000000';
+const PHONE_NUMBER_TEL = 'tel:+9779800000000';
+
+// Replace with your official WhatsApp number (keep country code)
+const WHATSAPP_LINK = 'https://wa.me/9779800000000?text=Hello%20EverCare%20—%20I%27d%20like%20to%20learn%20more';
 
 export default function Navbar() {
-  const [scrolled, setScrolled] = useState(false)
-  const [open, setOpen] = useState(false)
-  const [activeId, setActiveId] = useState<string | null>(null)
-  const location = useLocation()
-  const observerRef = useRef<IntersectionObserver | null>(null)
-  const headerRef = useRef<HTMLElement | null>(null)
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const menuButtonRef = useRef<HTMLButtonElement | null>(null);
+  const mobileMenuRef = useRef<HTMLDivElement | null>(null);
 
-  // --- Sticky styles on scroll
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8)
-    onScroll()
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
+    const onScroll = () => {
+      setScrolled(window.scrollY > 8);
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
-  // --- Utility: smooth scroll with sticky-navbar offset
-  const scrollWithOffset = (id: string, behavior: ScrollBehavior = 'smooth') => {
-    const el = document.getElementById(id)
-    if (!el) return
-    const headerH = (headerRef.current?.offsetHeight ?? 0) + 12 // add a little breathing room
-    const y = el.getBoundingClientRect().top + window.scrollY - headerH
-    window.scrollTo({ top: y, behavior })
-  }
-
-  // --- Handle clicking nav anchors (desktop + mobile)
-  const handleAnchorClick = (e: MouseEvent<HTMLAnchorElement>, id?: string) => {
-    if (!id) return
-    e.preventDefault()
-    setOpen(false)
-    // update URL hash without jumping
-    if (history.pushState) {
-      const url = id ? `#${id}` : '#'
-      history.pushState(null, '', url)
-    }
-    scrollWithOffset(id)
-  }
-
-  // --- Active link highlighting based on visible section
+  // Close menu when clicking outside
   useEffect(() => {
-    if (observerRef.current) {
-      observerRef.current.disconnect()
-      observerRef.current = null
-    }
+    if (!menuOpen) return;
 
-    const sections = NAV_ITEMS
-      .map((n) => n.id)
-      .filter(Boolean)
-      .map((id) => document.getElementById(id!))
-      .filter((el): el is HTMLElement => !!el)
-
-    if (sections.length === 0) return
-
-    const obs = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((e) => e.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)
-        if (visible[0]) setActiveId(visible[0].target.id)
-      },
-      {
-        root: null,
-        rootMargin: '0px 0px -55% 0px', // earlier trigger so the pill feels snappy
-        threshold: [0, 0.25, 0.5, 0.75, 1],
+    const onClickOutside = (e: MouseEvent) => {
+      if (
+        mobileMenuRef.current &&
+        !mobileMenuRef.current.contains(e.target as Node) &&
+        menuButtonRef.current &&
+        !menuButtonRef.current.contains(e.target as Node)
+      ) {
+        setMenuOpen(false);
       }
-    )
+    };
 
-    sections.forEach((sec) => obs.observe(sec))
-    observerRef.current = obs
-    return () => obs.disconnect()
-  }, [location.pathname])
+    const onEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMenuOpen(false);
+    };
 
-  // --- On first load or when hash changes (e.g., direct link), scroll with offset
-  useEffect(() => {
-    const hash = window.location.hash?.replace('#', '')
-    if (!hash) return
-    // wait one tick to ensure layout is ready
-    const t = setTimeout(() => scrollWithOffset(hash, 'auto'), 0)
-    return () => clearTimeout(t)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.pathname])
+    document.addEventListener('mousedown', onClickOutside);
+    document.addEventListener('keydown', onEscape);
+    return () => {
+      document.removeEventListener('mousedown', onClickOutside);
+      document.removeEventListener('keydown', onEscape);
+    };
+  }, [menuOpen]);
 
   return (
-    <header
-      ref={headerRef as any}
-      className={[
-        'sticky top-0 z-50 w-full transition',
-        'supports-[backdrop-filter]:backdrop-blur',
-        scrolled ? 'bg-white/70 border-b border-slate-200 shadow-[0_2px_20px_rgba(15,23,42,0.06)]' : 'bg-white/40',
-      ].join(' ')}
-    >
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 md:px-6">
-        {/* Brand */}
-        <Link to="/" className="flex items-center gap-3" onClick={() => setOpen(false)}>
-<img src="/logo.png" alt="EverCare logo" className="h-12 sm:h-14 md:h-16 w-auto shrink-0" />          
-        </Link>
+    <header className="sticky top-0 z-50">
+      {/* Promo banner (dismissible, persists via localStorage in Base v1) */}
+      <PromoBanner
+        theme="teal"
+        message="Father’s Day Special: First month 15% off on Premium Care • Limited time"
+      />
 
-        {/* Desktop nav */}
-        <nav className="hidden items-center gap-1 md:flex">
-          {NAV_ITEMS.map((item) => {
-            const isActive = activeId === item.id
-            return (
-              <a
-                key={item.href}
-                href={item.href}
-                onClick={(e) => handleAnchorClick(e, item.id)}
-                className="relative rounded-xl px-3 py-2 text-sm font-medium text-slate-700 transition hover:text-brand-teal"
-              >
-                <span className="relative z-10">{item.label}</span>
-                <AnimatePresence>
-                  {isActive && (
-                    <motion.span
-                      layoutId="nav-active-pill"
-                      className="absolute inset-0 z-0 rounded-xl bg-brand-teal/10"
-                      transition={{ type: 'spring', stiffness: 500, damping: 40 }}
-                    />
-                  )}
-                </AnimatePresence>
-              </a>
-            )
-          })}
-          <Link to="/enroll" className="ml-2">
-            <span
-              className={[
-                'inline-flex items-center rounded-xl px-3 py-2 text-sm font-semibold',
-                'bg-brand-teal text-white',
-                'shadow-[0_8px_16px_rgba(97,191,192,0.28)] hover:shadow-[0_12px_24px_rgba(97,191,192,0.35)]',
-                'transition hover:-translate-y-0.5',
-              ].join(' ')}
-            >
-              Enroll
-            </span>
-          </Link>
-        </nav>
-
-        {/* Mobile toggler */}
-        <button
-          className="inline-flex items-center justify-center rounded-xl p-2 ring-1 ring-slate-200 md:hidden"
-          onClick={() => setOpen((s) => !s)}
-          aria-label="Toggle menu"
+      {/* Nav bar */}
+      <div
+        className={[
+          'backdrop-blur supports-[backdrop-filter]:bg-white/70 transition-all',
+          scrolled ? 'bg-white/95 shadow-md' : 'bg-white/90 shadow-sm',
+        ].join(' ')}
+      >
+        <nav
+          className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"
+          aria-label="Primary"
         >
-          {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </button>
-      </div>
+          <div className="flex items-center justify-between py-2">
+            {/* Left: Brand */}
+            <div className="flex items-center gap-3">
+              <a href="/" className="flex items-center gap-3" aria-label="EverCare home">
+                <img
+                  src="/logo-evercare.svg"
+                  alt="EverCare"
+                  className="h-12 sm:h-14 md:h-16 w-auto shrink-0"
+                />
+              </a>
+            </div>
 
-      {/* Mobile menu */}
-      <AnimatePresence>
-        {open && (
-          <motion.nav
-            initial={{ opacity: 0, y: -6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -6 }}
-            transition={{ duration: 0.18, ease: 'easeOut' }}
-            className="border-t border-slate-200 bg-white/85 px-4 py-3 md:hidden"
-          >
-            <ul className="space-y-1">
-              {NAV_ITEMS.map((item) => {
-                const isActive = activeId === item.id
-                return (
-                  <li key={item.href}>
+            {/* Desktop nav */}
+            <div className="hidden md:flex items-center gap-8">
+              <ul className="flex items-center gap-6">
+                {NAV_LINKS.map((link) => (
+                  <li key={link.href}>
                     <a
-                      href={item.href}
-                      onClick={(e) => handleAnchorClick(e, item.id)}
-                      className={[
-                        'block rounded-xl px-3 py-2 text-sm font-medium',
-                        isActive ? 'bg-brand-teal/10 text-brand-teal' : 'text-slate-700',
-                      ].join(' ')}
+                      href={link.href}
+                      className="text-slate-700 hover:text-slate-900 transition-colors text-sm font-medium"
                     >
-                      {item.label}
+                      {link.label}
                     </a>
                   </li>
-                )
-              })}
-              <li className="pt-1">
-                <Link
-                  to="/enroll"
-                  onClick={() => setOpen(false)}
-                  className="block rounded-xl bg-brand-teal px-3 py-2 text-center text-sm font-semibold text-white"
+                ))}
+              </ul>
+
+              {/* Desktop CTAs */}
+              <div className="flex items-center gap-3">
+                <a
+                  href={WHATSAPP_LINK}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center rounded-full px-4 py-2 text-sm font-semibold shadow hover:shadow-md transition-all border border-emerald-600/20 bg-emerald-50 hover:bg-emerald-100"
+                  aria-label="Chat on WhatsApp"
                 >
-                  Enroll
-                </Link>
-              </li>
-            </ul>
-          </motion.nav>
-        )}
-      </AnimatePresence>
+                  <svg
+                    aria-hidden="true"
+                    viewBox="0 0 24 24"
+                    className="h-4 w-4 mr-2"
+                    fill="currentColor"
+                  >
+                    <path d="M20.52 3.48A11.94 11.94 0 0012.02 0C5.4 0 .03 5.37.03 12c0 2.11.55 4.17 1.6 6L0 24l6.17-1.6A11.94 11.94 0 0012 24c6.63 0 12-5.37 12-12 0-3.2-1.25-6.21-3.48-8.52zM12 21.9a9.9 9.9 0 01-5.05-1.4l-.36-.21-3.66.95.98-3.55-.23-.37A9.93 9.93 0 012.1 12C2.1 6.51 6.51 2.1 12 2.1c2.65 0 5.14 1.03 7.02 2.9A9.86 9.86 0 0121.9 12c0 5.49-4.41 9.9-9.9 9.9zm5.02-7.45c-.27-.14-1.57-.77-1.81-.86-.24-.09-.41-.14-.59.14-.18.27-.68.86-.83 1.04-.15.18-.31.2-.58.07-.27-.14-1.12-.41-2.13-1.31-.79-.7-1.32-1.57-1.47-1.84-.15-.27-.02-.42.12-.56.13-.13.27-.33.4-.5.14-.17.18-.29.27-.48.09-.18.04-.34-.02-.48-.07-.14-.59-1.42-.81-1.95-.21-.51-.43-.44-.59-.45-.15-.01-.33-.01-.51-.01-.18 0-.48.07-.73.34-.24.27-.96.94-.96 2.28s.98 2.65 1.12 2.83c.14.18 1.94 2.96 4.69 4.14.65.28 1.16.45 1.56.58.65.21 1.24.18 1.71.11.52-.08 1.57-.64 1.79-1.25.22-.61.22-1.12.15-1.25-.06-.13-.24-.2-.51-.34z" />
+                  </svg>
+                  WhatsApp
+                </a>
+
+                <a
+                  href={PHONE_NUMBER_TEL}
+                  className="inline-flex items-center rounded-full px-4 py-2 text-sm font-semibold text-white shadow hover:shadow-md transition-all bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                  aria-label={`Call ${PHONE_NUMBER_DISPLAY}`}
+                >
+                  <svg
+                    aria-hidden="true"
+                    viewBox="0 0 24 24"
+                    className="h-4 w-4 mr-2"
+                    fill="currentColor"
+                  >
+                    <path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 011 1V22a1 1 0 01-1 1C10.86 23 1 13.14 1 1a1 1 0 011-1h4.5a1 1 0 011 1c0 1.24.2 2.45.57 3.57a1 1 0 01-.24 1.02l-2.2 2.2z" />
+                  </svg>
+                  Call {PHONE_NUMBER_DISPLAY}
+                </a>
+              </div>
+            </div>
+
+            {/* Mobile: menu button + compact CTAs */}
+            <div className="md:hidden flex items-center gap-2">
+              <a
+                href={PHONE_NUMBER_TEL}
+                className="inline-flex items-center rounded-full px-3 py-2 text-xs font-semibold text-white shadow bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                aria-label={`Call ${PHONE_NUMBER_DISPLAY}`}
+              >
+                Call
+              </a>
+              <a
+                href={WHATSAPP_LINK}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center rounded-full px-3 py-2 text-xs font-semibold shadow border border-emerald-600/20 bg-emerald-50 hover:bg-emerald-100"
+                aria-label="Chat on WhatsApp"
+              >
+                Chat
+              </a>
+
+              <button
+                ref={menuButtonRef}
+                type="button"
+                className="ml-1 inline-flex items-center justify-center rounded-full p-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                aria-label="Toggle menu"
+                aria-expanded={menuOpen}
+                aria-controls="mobile-menu"
+                onClick={() => setMenuOpen((v) => !v)}
+              >
+                <svg
+                  className="h-6 w-6 text-slate-800"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  aria-hidden="true"
+                >
+                  {menuOpen ? (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  ) : (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  )}
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          {/* Mobile menu */}
+          <div
+            id="mobile-menu"
+            ref={mobileMenuRef}
+            className={[
+              'md:hidden origin-top transition-all duration-200',
+              menuOpen ? 'scale-y-100 opacity-100' : 'scale-y-95 opacity-0 pointer-events-none',
+            ].join(' ')}
+          >
+            <div className="mt-1 pb-3 pt-2 space-y-1">
+              {NAV_LINKS.map((link) => (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  className="block rounded-lg px-4 py-3 text-base font-medium text-slate-800 hover:bg-slate-50 focus:bg-slate-100 focus:outline-none"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  {link.label}
+                </a>
+              ))}
+
+              <div className="px-4 pt-2 flex items-center gap-2">
+                <a
+                  href={PHONE_NUMBER_TEL}
+                  className="flex-1 inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-semibold text-white shadow bg-emerald-600 hover:bg-emerald-700"
+                >
+                  Call
+                </a>
+                <a
+                  href={WHATSAPP_LINK}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-semibold shadow border border-emerald-600/20 bg-emerald-50 hover:bg-emerald-100"
+                >
+                  WhatsApp
+                </a>
+              </div>
+            </div>
+          </div>
+        </nav>
+      </div>
     </header>
-  )
+  );
 }
