@@ -1,0 +1,6 @@
+# robots.txt for EverCare Nepal
+User-agent: *
+Allow: /
+
+# Update this to your real domain when live
+Sitemap: https://YOUR_DOMAIN/sitemap.xml
