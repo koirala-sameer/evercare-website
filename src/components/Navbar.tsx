@@ -117,14 +117,15 @@ export default function Navbar() {
     <header
       ref={headerRef as any}
       className={[
-        'sticky top-0 z-50 w-full transition',
+        'sticky top-0 z-50 w-full transition-colors',
         'supports-[backdrop-filter]:backdrop-blur',
+        // Sharper contrast: solid bg + clearer borders and shadow when scrolled
         scrolled
-          ? 'bg-white/70 border-b border-slate-200 shadow-[0_2px_20px_rgba(15,23,42,0.06)]'
-          : 'bg-white/40',
+          ? 'bg-white border-b border-slate-200 shadow-[0_6px_24px_rgba(15,23,42,0.10)]'
+          : 'bg-white/95 border-b border-slate-100 shadow-[0_1px_0_rgba(2,24,43,0.04)]',
       ].join(' ')}
     >
-      {/* Promo banner */}
+      {/* Promo banner (unchanged) */}
       <PromoBanner
         theme="teal"
         message="Father’s Day Special: First month 15% off on Premium Care • Limited time"
@@ -161,7 +162,13 @@ export default function Navbar() {
                   <a
                     href={item.href}
                     onClick={(e) => handleAnchorClick(e, item.id)}
-                    className="relative rounded-xl px-3 py-2 text-sm font-medium text-slate-700 transition hover:text-brand-teal"
+                    className={[
+                      'relative rounded-lg px-3 py-2 text-sm font-semibold transition',
+                      // Higher base contrast + clearer hover
+                      'text-slate-900 hover:text-brand-teal',
+                      // Stronger focus ring for accessibility
+                      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-teal/60 focus-visible:ring-offset-2',
+                    ].join(' ')}
                     aria-current={isActive ? 'page' : undefined}
                   >
                     <span className="relative z-10">{item.label}</span>
@@ -169,7 +176,7 @@ export default function Navbar() {
                       {isActive && (
                         <motion.span
                           layoutId="nav-active-pill"
-                          className="absolute inset-0 z-0 rounded-xl bg-brand-teal/10"
+                          className="absolute inset-0 z-0 rounded-lg bg-brand-teal/15 ring-1 ring-brand-teal/25"
                           transition={{ type: 'spring', stiffness: 500, damping: 40 }}
                         />
                       )}
@@ -181,11 +188,11 @@ export default function Navbar() {
           </ul>
         </nav>
 
-        {/* Mobile: just menu button now */}
+        {/* Mobile: menu button only (unchanged logic, higher-contrast ring) */}
         <div className="md:hidden flex items-center gap-2">
           <button
             ref={menuButtonRef}
-            className="ml-1 inline-flex items-center justify-center rounded-xl p-2 ring-1 ring-slate-200"
+            className="ml-1 inline-flex items-center justify-center rounded-xl p-2 ring-1 ring-slate-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-teal/60"
             onClick={() => setOpen((s) => !s)}
             aria-label="Toggle menu"
             aria-expanded={open}
@@ -206,7 +213,7 @@ export default function Navbar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -6 }}
             transition={{ duration: 0.18, ease: 'easeOut' }}
-            className="border-t border-slate-200 bg-white/85 px-4 py-3 md:hidden"
+            className="border-t border-slate-200 bg-white px-4 py-3 md:hidden shadow-[0_8px_24px_rgba(15,23,42,0.08)]"
           >
             <ul className="space-y-1">
               {NAV_ITEMS.map((item) => {
@@ -217,10 +224,11 @@ export default function Navbar() {
                       href={item.href}
                       onClick={(e) => handleAnchorClick(e, item.id)}
                       className={[
-                        'block rounded-xl px-3 py-2 text-sm font-medium',
+                        'block rounded-xl px-3 py-2 text-sm font-semibold transition',
                         isActive
-                          ? 'bg-brand-teal/10 text-brand-teal'
-                          : 'text-slate-700',
+                          ? 'bg-brand-teal/15 text-brand-teal ring-1 ring-brand-teal/25'
+                          : 'text-slate-900 hover:bg-slate-50',
+                        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-teal/60',
                       ].join(' ')}
                       aria-current={isActive ? 'page' : undefined}
                     >
@@ -233,7 +241,7 @@ export default function Navbar() {
                 <Link
                   to="/enroll"
                   onClick={() => setOpen(false)}
-                  className="block rounded-xl bg-brand-teal px-3 py-2 text-center text-sm font-semibold text-white"
+                  className="block rounded-xl bg-brand-teal px-3 py-2 text-center text-sm font-bold text-white hover:bg-brand-teal/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-teal/60"
                 >
                   Enroll
                 </Link>
