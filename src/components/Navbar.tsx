@@ -14,9 +14,9 @@ const NAV_ITEMS: NavItem[] = [
   { label: 'FAQ', href: '#faq', id: 'faq' },
 ]
 
-// Base-aware path for /public assets (works on subpaths e.g. /evercare-website/)
-const publicAsset = (p: string) => `${import.meta.env.BASE_URL}${p.replace(/^\/+/, '')}`
-const LOGO_SRC = publicAsset('logo.png')
+// You can keep this pointing to your real logo asset.
+// There's a runtime fallback to /logo.png if /logo.svg isn't found.
+const LOGO_SRC = '/logo.svg'
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
@@ -56,48 +56,47 @@ export default function Navbar() {
     scrollWithOffset(id)
   }
 
-  // Active link highlighting
+  // Track active section via IntersectionObserver
   useEffect(() => {
-    if (observerRef.current) {
-      observerRef.current.disconnect()
-      observerRef.current = null
+    if (location.pathname !== '/') {
+      setActiveId(null)
+      return
     }
-    const sections = NAV_ITEMS
-      .map((n) => n.id)
-      .filter(Boolean)
-      .map((id) => document.getElementById(id!))
-      .filter((el): el is HTMLElement => !!el)
+    const ids = NAV_ITEMS.map((n) => n.id).filter(Boolean) as string[]
+    const sections = ids
+      .map((id) => document.getElementById(id))
+      .filter(Boolean) as HTMLElement[]
 
-    if (sections.length === 0) return
+    if (!sections.length) return
 
-    const obs = new IntersectionObserver(
+    const observer = new IntersectionObserver(
       (entries) => {
+        // Pick the most visible / nearest to top
         const visible = entries
           .filter((e) => e.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)
-        if (visible[0]) setActiveId(visible[0].target.id)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)
+        if (visible[0]?.target?.id) setActiveId(visible[0].target.id)
       },
       {
-        root: null,
-        rootMargin: '0px 0px -55% 0px',
-        threshold: [0, 0.25, 0.5, 0.75, 1],
+        rootMargin: '-40% 0px -55% 0px', // feel free to tweak
+        threshold: [0, 0.2, 0.5, 1],
       }
     )
-
-    sections.forEach((s) => obs.observe(s))
-    observerRef.current = obs
-    return () => obs.disconnect()
+    observerRef.current = observer
+    sections.forEach((s) => observer.observe(s))
+    return () => observer.disconnect()
   }, [location.pathname])
 
-  // Close menu on outside click + Esc
+  // Close mobile on outside click / Esc
   useEffect(() => {
     if (!open) return
-    const onClickOutside = (e: MouseEvent) => {
+    const onClickOutside = (e: MouseEvent | any) => {
+      const target = e.target as Node
       if (
         mobileMenuRef.current &&
-        !mobileMenuRef.current.contains(e.target as Node) &&
+        !mobileMenuRef.current.contains(target) &&
         menuButtonRef.current &&
-        !menuButtonRef.current.contains(e.target as Node)
+        !menuButtonRef.current.contains(target)
       ) {
         setOpen(false)
       }
@@ -118,14 +117,15 @@ export default function Navbar() {
       ref={headerRef as any}
       className={[
         'sticky top-0 z-50 w-full transition-colors',
-        'supports-[backdrop-filter]:backdrop-blur',
-        // Sharper contrast: solid bg + clearer borders and shadow when scrolled
+        // higher contrast base, slightly more opaque when scrolled
         scrolled
-          ? 'bg-white border-b border-slate-200 shadow-[0_6px_24px_rgba(15,23,42,0.10)]'
-          : 'bg-white/95 border-b border-slate-100 shadow-[0_1px_0_rgba(2,24,43,0.04)]',
+          ? 'bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/85 shadow-md'
+          : 'bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/80 shadow-sm',
+        // crisp under-border for separation
+        'border-b border-slate-200',
       ].join(' ')}
     >
-      {/* Promo banner (unchanged) */}
+      {/* Promo banner */}
       <PromoBanner
         theme="teal"
         message="Father’s Day Special: First month 15% off on Premium Care • Limited time"
@@ -162,43 +162,60 @@ export default function Navbar() {
                   <a
                     href={item.href}
                     onClick={(e) => handleAnchorClick(e, item.id)}
-                    className={[
-                      'relative rounded-lg px-3 py-2 text-sm font-semibold transition',
-                      // Higher base contrast + clearer hover
-                      'text-slate-900 hover:text-brand-teal',
-                      // Stronger focus ring for accessibility
-                      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-teal/60 focus-visible:ring-offset-2',
-                    ].join(' ')}
+                    data-active={isActive ? 'true' : undefined}
                     aria-current={isActive ? 'page' : undefined}
+                    className={[
+                      // higher-contrast base text, slightly larger tracking
+                      'inline-flex items-center rounded-xl px-3 py-2 text-[15px] font-medium',
+                      'text-slate-900',
+                      // clear hover with strong contrast (dark text on light chip)
+                      'hover:bg-slate-100',
+                      // active = filled dark for maximum contrast
+                      'data-[active=true]:bg-slate-900 data-[active=true]:text-white',
+                      // underline accent when not filled
+                      'data-[active=true]:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)]',
+                      // keyboard focus ring (brand)
+                      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-teal/60 focus-visible:ring-offset-2 focus-visible:ring-offset-white',
+                      // motion polish
+                      'transition-colors',
+                    ].join(' ')}
                   >
-                    <span className="relative z-10">{item.label}</span>
-                    <AnimatePresence>
-                      {isActive && (
-                        <motion.span
-                          layoutId="nav-active-pill"
-                          className="absolute inset-0 z-0 rounded-lg bg-brand-teal/15 ring-1 ring-brand-teal/25"
-                          transition={{ type: 'spring', stiffness: 500, damping: 40 }}
-                        />
-                      )}
-                    </AnimatePresence>
+                    {item.label}
                   </a>
                 </li>
               )
             })}
           </ul>
+
+          {/* Divider */}
+          <span className="mx-2 h-6 w-px bg-slate-200" aria-hidden />
+
+          {/* Enroll CTA — keep as is, but slightly stronger hover/contrast */}
+          <Link
+            to="/enroll"
+            className={[
+              'inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm font-semibold',
+              'bg-brand-teal text-white shadow-sm',
+              'hover:brightness-95 active:brightness-90',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-teal/60 focus-visible:ring-offset-2 focus-visible:ring-offset-white',
+              'transition',
+            ].join(' ')}
+          >
+            Enroll
+          </Link>
         </nav>
 
         {/* Mobile: menu button only (unchanged logic, higher-contrast ring) */}
         <div className="md:hidden flex items-center gap-2">
           <button
             ref={menuButtonRef}
-            className="ml-1 inline-flex items-center justify-center rounded-xl p-2 ring-1 ring-slate-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-teal/60"
+            className="ml-1 inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white p-2 text-slate-900 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-teal/60"
             onClick={() => setOpen((s) => !s)}
             aria-label="Toggle menu"
             aria-expanded={open}
             aria-controls="mobile-menu"
           >
-            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            {open ? <X size={20} /> : <Menu size={20} />}
           </button>
         </div>
       </div>
@@ -223,25 +240,28 @@ export default function Navbar() {
                     <a
                       href={item.href}
                       onClick={(e) => handleAnchorClick(e, item.id)}
-                      className={[
-                        'block rounded-xl px-3 py-2 text-sm font-semibold transition',
-                        isActive
-                          ? 'bg-brand-teal/15 text-brand-teal ring-1 ring-brand-teal/25'
-                          : 'text-slate-900 hover:bg-slate-50',
-                        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-teal/60',
-                      ].join(' ')}
+                      data-active={isActive ? 'true' : undefined}
                       aria-current={isActive ? 'page' : undefined}
+                      className={[
+                        'block rounded-lg px-3 py-2.5 text-[15px] font-medium',
+                        'text-slate-900',
+                        'hover:bg-slate-100',
+                        'data-[active=true]:bg-slate-900 data-[active=true]:text-white',
+                        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-teal/60',
+                        'transition-colors',
+                      ].join(' ')}
                     >
                       {item.label}
                     </a>
                   </li>
                 )
               })}
-              <li className="pt-1">
+
+              <li className="pt-2">
                 <Link
                   to="/enroll"
                   onClick={() => setOpen(false)}
-                  className="block rounded-xl bg-brand-teal px-3 py-2 text-center text-sm font-bold text-white hover:bg-brand-teal/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-teal/60"
+                  className="block rounded-xl bg-brand-teal px-3 py-2.5 text-center text-white font-semibold shadow-sm hover:brightness-95 active:brightness-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-teal/60"
                 >
                   Enroll
                 </Link>
