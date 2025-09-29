@@ -1,14 +1,8 @@
-import { motion, useScroll, useTransform, useReducedMotion } from 'framer-motion'
-import { useRef, useEffect, useState, lazy, Suspense } from 'react'
+import { motion, useReducedMotion } from 'framer-motion'
+import { useEffect, useState, lazy, Suspense } from 'react'
 import {
   ArrowRight,
   ShieldCheck,
-  Heart,
-  Phone,
-  Clock,
-  UserRoundCheck,
-  ChevronLeft,
-  ChevronRight,
   Users,
   Home as HomeIcon,
   Stethoscope,
@@ -23,8 +17,11 @@ import { Link } from 'react-router-dom'
 const Testimonials = lazy(() => import('../sections/home/Testimonials'))
 const Plans = lazy(() => import('../sections/home/Plans'))
 const AddOnsShowcase = lazy(() => import('../sections/home/AddOnsShowcase'))
+// NEW: extracted below
+const ImpactStats = lazy(() => import('../sections/home/ImpactStats'))
+const HowItWorksTimeline = lazy(() => import('../sections/home/HowItWorksTimeline'))
 
-// NEW: Hero moved to a dedicated file (regular import to keep it eagerly rendered)
+// Hero is eagerly loaded (keeps above-the-fold snappy)
 import Hero from '../sections/home/Hero'
 
 export default function Home() {
@@ -54,7 +51,6 @@ export default function Home() {
       // move focus for accessibility
       el.setAttribute('tabindex', '-1')
       el.focus({ preventScroll: true })
-      // cleanup tabindex after focus (optional)
       const t = setTimeout(() => el.removeAttribute('tabindex'), 1000)
       return () => clearTimeout(t)
     }
@@ -82,13 +78,17 @@ export default function Home() {
         <WhoItsFor />
         <StorySections />
 
-        {/* Lazy modules below - keep layout/anchors identical */}
         <Suspense fallback={<SectionSkeleton />}>
           <Testimonials />
         </Suspense>
 
-        <ImpactStats />
-        <HowItWorksTimeline />
+        <Suspense fallback={<SectionSkeleton />}>
+          <ImpactStats />
+        </Suspense>
+
+        <Suspense fallback={<SectionSkeleton />}>
+          <HowItWorksTimeline />
+        </Suspense>
 
         <Suspense fallback={<SectionSkeleton id="plans" />}>
           <Plans />
@@ -137,70 +137,8 @@ const fadeUp = {
 // Helper to apply motion props conditionally when reduced motion is requested
 function motionGuard(shouldReduce: boolean, viewportAmount = 0.35) {
   return shouldReduce
-    ? { /* no motion props */ }
+    ? {}
     : { initial: 'hidden' as const, whileInView: 'show' as const, viewport: { once: true, amount: viewportAmount } }
-}
-
-/** ---------- AnimatedNumber ---------- */
-type AnimatedNumberProps = {
-  to: number
-  from?: number
-  duration?: number
-  prefix?: string
-  suffix?: string
-  className?: string
-  formatter?: (v: number) => string
-}
-
-function AnimatedNumber({
-  to,
-  from = 0,
-  duration = 1.6,
-  prefix = '',
-  suffix = '',
-  className,
-  formatter = (v) => v.toLocaleString(),
-}: AnimatedNumberProps) {
-  const [val, setVal] = useState(from)
-  const [hasAnimated, setHasAnimated] = useState(false)
-  const ref = useRef<HTMLSpanElement | null>(null)
-  const shouldReduce = useReducedMotion() ?? false
-
-  useEffect(() => {
-    if (shouldReduce) {
-      setVal(to)
-      return
-    }
-    const el = ref.current
-    if (!el) return
-    const obs = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !hasAnimated) {
-          setHasAnimated(true)
-          const start = performance.now()
-          const tick = (now: number) => {
-            const t = Math.min((now - start) / (duration * 1000), 1)
-            const ease = 1 - Math.pow(1 - t, 3)
-            const current = from + (to - from) * ease
-            setVal(current)
-            if (t < 1) requestAnimationFrame(tick)
-          }
-          requestAnimationFrame(tick)
-        }
-      },
-      { threshold: 0.5 }
-    )
-    obs.observe(el)
-    return () => obs.disconnect()
-  }, [from, to, duration, hasAnimated, shouldReduce])
-
-  return (
-    <span ref={ref} className={className} aria-live="off">
-      {prefix}
-      {formatter(Math.round(val))}
-      {suffix}
-    </span>
-  )
 }
 
 /** ==================  Sections kept inline (unchanged visuals) ================== */
@@ -219,7 +157,7 @@ function TrustBar() {
             <span>Radical transparency</span>
           </>,
           <>
-            <UserRoundCheck className="h-5 w-5 text-brand-teal/90" />
+            <Users className="h-5 w-5 text-brand-teal/90" />
             <span>Verified caregivers</span>
           </>,
           <>
@@ -227,8 +165,8 @@ function TrustBar() {
             <span>Safety-first operations</span>
           </>,
           <>
-            <Clock className="h-5 w-5 text-brand-teal/90" />
-            <span>Fast response</span>
+            <ShieldCheck className="invisible h-5 w-5" />
+            <span className="sr-only">spacer</span>
           </>,
         ].map((content, i) => (
           <motion.div key={i} variants={fadeUp} className="flex items-center gap-2">
@@ -371,98 +309,10 @@ function StorySections() {
   )
 }
 
-/* ================== Sections still inline ================== */
-function ImpactStats() {
-  const shouldReduce = useReducedMotion() ?? false
-  return (
-    <section className="bg-white">
-      <div className="mx-auto max-w-7xl px-6 py-20">
-        <motion.div className="mx-auto max-w-2xl text-center" variants={staggerParent} {...motionGuard(shouldReduce, 0.35)}>
-          <motion.h3 variants={fadeUp} className="text-3xl font-semibold tracking-tight text-brand-ink md:text-4xl">
-            We’re already making a difference
-          </motion.h3>
-          <motion.p variants={fadeUp} className="mt-4 text-slate-700">
-            Quietly reliable, always present — and built for families abroad.
-          </motion.p>
-        </motion.div>
-
-        <motion.div variants={staggerParent} {...motionGuard(shouldReduce, 0.35)} className="mt-12 grid grid-cols-2 gap-6 md:grid-cols-4">
-          <motion.div variants={fadeUp} className="rounded-2xl border border-slate-200 bg-white p-6 text-center">
-            <AnimatedNumber to={2500} suffix="+" className="text-4xl font-bold text-brand-ink" />
-            <p className="mt-2 text-sm text-slate-600">Hours of care delivered</p>
-          </motion.div>
-          <motion.div variants={fadeUp} className="rounded-2xl border border-slate-200 bg-white p-6 text-center">
-            <AnimatedNumber to={100} suffix="%" className="text-4xl font-bold text-brand-ink" />
-            <p className="mt-2 text-sm text-slate-600">Verified caregivers</p>
-          </motion.div>
-          <motion.div variants={fadeUp} className="rounded-2xl border border-slate-200 bg-white p-6 text-center">
-            <AnimatedNumber to={2} suffix="+" className="text-4xl font-bold text-brand-ink" />
-            <p className="mt-2 text-sm text-slate-600">Cities live (KTM, PKR)</p>
-          </motion.div>
-          <motion.div variants={fadeUp} className="rounded-2xl border border-slate-200 bg-white p-6 text-center">
-            <AnimatedNumber to={0} className="text-4xl font-bold text-brand-ink" />
-            <p className="mt-2 text-sm text-slate-600">Missed check-ins</p>
-          </motion.div>
-        </motion.div>
-      </div>
-    </section>
-  )
-}
-
-function HowItWorksTimeline() {
-  const timelineRef = useRef<HTMLDivElement>(null)
-  const shouldReduce = useReducedMotion() ?? false
-  const { scrollYProgress } = useScroll({ target: timelineRef, offset: ['start 80%', 'end 20%'] })
-  const scaleY = useTransform(scrollYProgress, [0, 1], shouldReduce ? [1, 1] : [0, 1])
-
-  const steps = [
-    { icon: <Phone className="h-5 w-5" />, title: 'Tell us what’s needed', desc: 'Share your parent’s routines, priorities, and any medical context.' },
-    { icon: <UserRoundCheck className="h-5 w-5" />, title: 'We match & set up', desc: 'Care manager, verified caregiver(s), and a clear weekly plan.' },
-    { icon: <ShieldCheck className="h-5 w-5" />, title: 'You see everything', desc: 'Visits, spends, updates—always visible in your family dashboard.' },
-  ]
-
-  return (
-    <section className="bg-white">
-      <div className="mx-auto max-w-5xl px-6 py-16">
-        <motion.div className="text-center" variants={staggerParent} {...motionGuard(shouldReduce, 0.35)}>
-          <motion.h3 variants={fadeUp} className="text-3xl font-semibold tracking-tight text-brand-ink md:text-4xl">How it works</motion.h3>
-          <motion.p variants={fadeUp} className="mt-3 text-slate-700">Smooth onboarding in days, not weeks.</motion.p>
-        </motion.div>
-
-        <div ref={timelineRef} className="relative mx-auto mt-10 grid max-w-3xl grid-cols-[24px_1fr] gap-x-4">
-          <div className="relative">
-            <div className="absolute left-1/2 top-0 -translate-x-1/2 h-full w-[2px] bg-slate-200" />
-            <motion.div style={{ scaleY, transformOrigin: 'top' }} className="absolute left-1/2 top-0 -translate-x-1/2 h-full w-[2px] bg-gradient-to-b from-brand-teal to-[#f58a8c]" />
-          </div>
-
-          <div className="space-y-8">
-            {steps.map((s, i) => (
-              <motion.div key={i} variants={fadeUp} {...motionGuard(shouldReduce, 0.5)} className="relative">
-                <div className="grid grid-cols-[24px_1fr] gap-x-4">
-                  <div className="relative z-10 flex items-start justify-center">
-                    <div className="grid h-6 w-6 place-items-center rounded-full border border-brand-teal bg-white text-brand-teal shadow-sm">{s.icon}</div>
-                  </div>
-                  <Card className="p-5">
-                    <div className="flex items-center gap-2">
-                      <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-brand-teal/10 text-brand-teal text-xs font-semibold">{i + 1}</span>
-                      <h4 className="text-base font-semibold text-brand-ink">{s.title}</h4>
-                    </div>
-                    <p className="mt-2 text-slate-700">{s.desc}</p>
-                  </Card>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  )
-}
-
 function SecurityPrivacy() {
   const shouldReduce = useReducedMotion() ?? false
   const items = [
-    { icon: <UserRoundCheck className="h-6 w-6 text-brand-teal" />, title: 'Vetted caregivers', desc: 'Background checks, references verified, and ongoing quality audits.', bg: 'from-brand-teal/10 to-transparent' },
+    { icon: <Users className="h-6 w-6 text-brand-teal" />, title: 'Vetted caregivers', desc: 'Background checks, references verified, and ongoing quality audits.', bg: 'from-brand-teal/10 to-transparent' },
     { icon: <Lock className="h-6 w-6 text-brand-ink" />, title: 'Secure by default', desc: 'Encrypted data at rest & in transit. Role-based access for families.', bg: 'from-slate-300/20 to-transparent' },
     { icon: <AlertTriangle className="h-6 w-6 text-[#f58a8c]" />, title: 'Emergency playbooks', desc: 'Clear SOPs for incidents: escalation, hospitals, and family alerts.', bg: 'from-[#f58a8c]/10 to-transparent' },
   ]
