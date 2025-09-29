@@ -22,20 +22,33 @@ import { Link } from 'react-router-dom'
 export default function Home() {
   return (
     <div className="min-h-screen w-full">
+      {/* Accessible skip link (appears when focused) */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:shadow focus:ring-2 focus:ring-brand-teal"
+      >
+        Skip to main content
+      </a>
+
       <Navbar />
-      <Hero />
-      <TrustBar />
-      <NarrativeLine />
-      <WhoItsFor />
-      <StorySections />
-      <Testimonials />
-      <ImpactStats />
-      <HowItWorksTimeline />
-      <Plans />
-      <AddOnsShowcase />
-      <SecurityPrivacy />
-      <FAQ />
-      <FinalCTA />
+
+      {/* Main landmark for screen readers / keyboard users */}
+      <main id="main-content">
+        <Hero />
+        <TrustBar />
+        <NarrativeLine />
+        <WhoItsFor />
+        <StorySections />
+        <Testimonials />
+        <ImpactStats />
+        <HowItWorksTimeline />
+        <Plans />
+        <AddOnsShowcase />
+        <SecurityPrivacy />
+        <FAQ />
+        <FinalCTA />
+      </main>
+
       <Footer />
     </div>
   )
