@@ -1,5 +1,5 @@
 import { motion, useScroll, useTransform, useReducedMotion } from 'framer-motion'
-import { useRef, useEffect, useState } from 'react'
+import { useRef, useEffect, useState, lazy, Suspense } from 'react'
 import {
   ArrowRight,
   ShieldCheck,
@@ -18,6 +18,11 @@ import {
 import Navbar from '../components/Navbar'
 import { Button, Card, GhostButton } from '../components/ui'
 import { Link } from 'react-router-dom'
+
+// Lazily-loaded sections (moved to /sections/home)
+const Testimonials = lazy(() => import('../sections/home/Testimonials'))
+const Plans = lazy(() => import('../sections/home/Plans'))
+const AddOnsShowcase = lazy(() => import('../sections/home/AddOnsShowcase'))
 
 export default function Home() {
   // Detect reduced motion for anchor scrolling behavior
@@ -73,11 +78,23 @@ export default function Home() {
         <NarrativeLine />
         <WhoItsFor />
         <StorySections />
-        <Testimonials />
+
+        {/* Lazy modules below - keep layout/anchors identical */}
+        <Suspense fallback={<SectionSkeleton />}>
+          <Testimonials />
+        </Suspense>
+
         <ImpactStats />
         <HowItWorksTimeline />
-        <Plans />
-        <AddOnsShowcase />
+
+        <Suspense fallback={<SectionSkeleton id="plans" />}>
+          <Plans />
+        </Suspense>
+
+        <Suspense fallback={<SectionSkeleton id="addons" />}>
+          <AddOnsShowcase />
+        </Suspense>
+
         <SecurityPrivacy />
         <FAQ />
         <FinalCTA />
@@ -85,6 +102,22 @@ export default function Home() {
 
       <Footer />
     </div>
+  )
+}
+
+/** ---------- Lightweight Suspense fallback ---------- */
+function SectionSkeleton({ id }: { id?: string }) {
+  return (
+    <section id={id} className="bg-white">
+      <div className="mx-auto max-w-7xl px-6 py-16">
+        <div className="h-6 w-48 animate-pulse rounded bg-slate-200" />
+        <div className="mt-6 grid gap-6 md:grid-cols-3">
+          <div className="h-40 animate-pulse rounded-xl bg-slate-100" />
+          <div className="h-40 animate-pulse rounded-xl bg-slate-100" />
+          <div className="h-40 animate-pulse rounded-xl bg-slate-100" />
+        </div>
+      </div>
+    </section>
   )
 }
 
@@ -131,15 +164,12 @@ function AnimatedNumber({
   const shouldReduce = useReducedMotion() ?? false
 
   useEffect(() => {
-    // If user prefers reduced motion, jump to final value
     if (shouldReduce) {
       setVal(to)
       return
     }
-
     const el = ref.current
     if (!el) return
-
     const obs = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting && !hasAnimated) {
@@ -157,7 +187,6 @@ function AnimatedNumber({
       },
       { threshold: 0.5 }
     )
-
     obs.observe(el)
     return () => obs.disconnect()
   }, [from, to, duration, hasAnimated, shouldReduce])
@@ -171,14 +200,11 @@ function AnimatedNumber({
   )
 }
 
+/** ==================  Sections kept inline (unchanged visuals) ================== */
 function Hero() {
   const heroRef = useRef<HTMLDivElement>(null)
   const shouldReduce = useReducedMotion() ?? false
-  const { scrollYProgress } = useScroll({
-    target: heroRef,
-    offset: ['start end', 'end start'],
-  })
-  // Parallax disabled if reduced motion
+  const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start end', 'end start'] })
   const imgY = useTransform(scrollYProgress, [0, 1], shouldReduce ? [0, 0] : [0, -40])
   const overlayY = useTransform(scrollYProgress, [0, 1], shouldReduce ? [0, 0] : [0, -16])
 
@@ -186,48 +212,28 @@ function Hero() {
     <section ref={heroRef} className="relative overflow-hidden bg-gradient-to-b from-white via-brand-cloud/40 to-white">
       <div className="pointer-events-none absolute inset-0 bg-[url('/banner-caregiver.jpg')] bg-cover bg-center opacity-10 md:opacity-20" />
       <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 px-6 py-24 md:grid-cols-2 md:py-32">
-        <motion.div
-          variants={staggerParent}
-          {...motionGuard(shouldReduce, 0.35)}
-        >
+        <motion.div variants={staggerParent} {...motionGuard(shouldReduce, 0.35)}>
           <motion.div variants={fadeUp}>
             <span className="inline-block rounded-full bg-[#f58a8c]/15 px-3 py-1 text-sm font-semibold text-[#f58a8c] ring-1 ring-[#f58a8c]/30">
               One Platform. Total Peace of Mind.
             </span>
           </motion.div>
 
-          <motion.h1
-            variants={fadeUp}
-            className="mt-5 text-[2.5rem] font-extrabold leading-[1.05] tracking-tight text-brand-ink md:text-6xl lg:text-7xl"
-          >
+          <motion.h1 variants={fadeUp} className="mt-5 text-[2.5rem] font-extrabold leading-[1.05] tracking-tight text-brand-ink md:text-6xl lg:text-7xl">
             Care for your parents{' '}
             <span className="bg-gradient-to-r from-brand-teal to-[#f58a8c] bg-clip-text text-transparent">
               as if you were here.
             </span>
           </motion.h1>
 
-          <motion.p
-            variants={fadeUp}
-            className="mt-5 max-w-xl text-lg leading-relaxed text-slate-700"
-          >
+          <motion.p variants={fadeUp} className="mt-5 max-w-xl text-lg leading-relaxed text-slate-700">
             EverCare integrates daily living support, safety, health, and concierge services into a single
             membership designed for Nepali families with loved ones back home.
           </motion.p>
 
           <motion.div variants={fadeUp} className="mt-8 flex flex-wrap gap-4">
             <a href="#plans">
-              <Button
-                className="
-                  relative inline-flex items-center gap-2 rounded-2xl px-6 py-3 text-base font-semibold
-                  bg-gradient-to-r from-brand-teal to-[#6fd1d2] text-white shadow-[0_10px_20px_rgba(97,191,192,0.35)]
-                  hover:shadow-[0_16px_32px_rgba(97,191,192,0.45)] hover:translate-y-[-1px]
-                  active:translate-y-[0px] active:shadow-[0_8px_16px_rgba(97,191,192,0.35)]
-                  transition-all duration-200 ease-out
-                  focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-teal focus-visible:ring-offset-2
-                  before:pointer-events-none before:absolute before:inset-0 before:rounded-[inherit]
-                  before:bg-gradient-to-b before:from-white/25 before:to-white/0
-                "
-              >
+              <Button className="relative inline-flex items-center gap-2 rounded-2xl px-6 py-3 text-base font-semibold bg-gradient-to-r from-brand-teal to-[#6fd1d2] text-white shadow-[0_10px_20px_rgba(97,191,192,0.35)] hover:shadow-[0_16px_32px_rgba(97,191,192,0.45)] hover:translate-y-[-1px] active:translate-y-[0px] active:shadow-[0_8px_16px_rgba(97,191,192,0.35)] transition-all duration-200 ease-out focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-teal focus-visible:ring-offset-2 before:pointer-events-none before:absolute before:inset-0 before:rounded-[inherit] before:bg-gradient-to-b before:from-white/25 before:to-white/0">
                 Enroll now <ArrowRight className="h-4 w-4" />
               </Button>
             </a>
@@ -262,10 +268,7 @@ function Hero() {
               decoding="async"
               fetchPriority="high"
             />
-            <motion.div
-              style={{ y: overlayY }}
-              className="absolute -bottom-6 left-6 right-6 rounded-2xl border border-slate-200 bg-white p-4 shadow-soft"
-            >
+            <motion.div style={{ y: overlayY }} className="absolute -bottom-6 left-6 right-6 rounded-2xl border border-slate-200 bg-white p-4 shadow-soft">
               <div className="flex items-center gap-3">
                 <div className="grid h-10 w-10 place-items-center rounded-xl bg-[#f58a8c]/10">
                   <Heart className="h-5 w-5 text-[#f58a8c]" />
@@ -325,11 +328,7 @@ function NarrativeLine() {
   return (
     <section className="bg-white">
       <div className="mx-auto -mt-6 max-w-5xl px-6 pb-10">
-        <motion.p
-          variants={staggerParent}
-          {...motionGuard(shouldReduce, 0.5)}
-          className="text-center text-slate-700"
-        >
+        <motion.p variants={staggerParent} {...motionGuard(shouldReduce, 0.5)} className="text-center text-slate-700">
           Real moments — from meals to medicine to meaningful time outside.
         </motion.p>
       </div>
@@ -369,11 +368,7 @@ function WhoItsFor() {
   return (
     <section className="bg-white">
       <div className="mx-auto max-w-7xl px-6 py-12">
-        <motion.div
-          className="mx-auto max-w-2xl text-center"
-          variants={staggerParent}
-          {...motionGuard(shouldReduce, 0.35)}
-        >
+        <motion.div className="mx-auto max-w-2xl text-center" variants={staggerParent} {...motionGuard(shouldReduce, 0.35)}>
           <motion.h3 variants={fadeUp} className="text-3xl font-semibold tracking-tight text-brand-ink md:text-4xl">
             Who it’s for
           </motion.h3>
@@ -382,11 +377,7 @@ function WhoItsFor() {
           </motion.p>
         </motion.div>
 
-        <motion.div
-          variants={staggerParent}
-          {...motionGuard(shouldReduce, 0.35)}
-          className="mt-10 grid gap-6 md:grid-cols-3"
-        >
+        <motion.div variants={staggerParent} {...motionGuard(shouldReduce, 0.35)} className="mt-10 grid gap-6 md:grid-cols-3">
           {items.map((it, i) => (
             <motion.div key={i} variants={fadeUp} whileHover={shouldReduce ? undefined : { y: -3 }} transition={{ duration: 0.2 }}>
               <Card className="relative overflow-hidden p-6">
@@ -448,12 +439,8 @@ function StorySections() {
                 {it.text}
               </motion.p>
               <motion.ul variants={staggerParent} className="mt-6 grid grid-cols-1 gap-3 text-slate-700 md:grid-cols-2">
-                {['Reliable scheduling','Care manager updates','Digital payments & receipts','Family group access'].map((li, i) => (
-                  <motion.li
-                    key={i}
-                    variants={fadeUp}
-                    className="rounded-2xl border border-slate-200 bg-white p-4 transition hover:-translate-y-0.5 hover:shadow-md hover:bg-[#f58a8c]/5"
-                  >
+                {['Reliable scheduling', 'Care manager updates', 'Digital payments & receipts', 'Family group access'].map((li, i) => (
+                  <motion.li key={i} variants={fadeUp} className="rounded-2xl border border-slate-200 bg-white p-4 transition hover:-translate-y-0.5 hover:shadow-md hover:bg-[#f58a8c]/5">
                     {li}
                   </motion.li>
                 ))}
@@ -466,139 +453,13 @@ function StorySections() {
   )
 }
 
-/* =========================================
-   TESTIMONIALS — overlap-free + vibrant accents
-========================================= */
-function Testimonials() {
-  const shouldReduce = useReducedMotion() ?? false
-  const items = [
-    {
-      quote:
-        'The weekly wellness calls and photo updates eased my anxiety instantly. It feels like I’m right there with my mom.',
-      name: 'Aarav S.',
-      role: 'Son in Sydney',
-    },
-    {
-      quote:
-        'They set up a clear routine—meals, meds, and a gentle walk every evening. My father smiles more now.',
-      name: 'Prabina T.',
-      role: 'Daughter in Toronto',
-    },
-    {
-      quote:
-        'Transparent, punctual, compassionate. The dashboard updates keep our whole family aligned.',
-      name: 'Kiran & Maya',
-      role: 'Family in the US',
-    },
-  ]
-  const [idx, setIdx] = useState(0)
-  const [paused, setPaused] = useState(false)
-
-  useEffect(() => {
-    if (paused || shouldReduce) return
-    const t = setInterval(() => setIdx((p) => (p + 1) % items.length), 6000)
-    return () => clearInterval(t)
-  }, [paused, items.length, shouldReduce])
-
-  const prev = () => setIdx((p) => (p - 1 + items.length) % items.length)
-  const next = () => setIdx((p) => (p + 1) % items.length)
-
-  const active = items[idx]
-
-  return (
-    <section className="bg-gradient-to-b from-white via-[#f58a8c]/5 to-white">
-      <div className="mx-auto max-w-5xl px-6 py-16">
-        <motion.div
-          className="text-center"
-          variants={staggerParent}
-          {...motionGuard(shouldReduce, 0.35)}
-        >
-          <motion.h3 variants={fadeUp} className="text-3xl font-semibold tracking-tight text-brand-ink md:text-4xl">
-            What families say
-          </motion.h3>
-          <motion.p variants={fadeUp} className="mt-3 text-slate-700">
-            Real words from the diaspora caring for parents in Nepal.
-          </motion.p>
-        </motion.div>
-
-        <div
-          className="mx-auto mt-10 max-w-3xl"
-          onMouseEnter={() => setPaused(true)}
-          onMouseLeave={() => setPaused(false)}
-        >
-          <motion.div
-            key={idx}
-            initial={shouldReduce ? undefined : { opacity: 0, y: 8 }}
-            animate={shouldReduce ? undefined : { opacity: 1, y: 0 }}
-            exit={shouldReduce ? undefined : { opacity: 0, y: -8 }}
-            transition={{ duration: 0.35, ease: 'easeOut' }}
-          >
-            <Card className="relative overflow-hidden p-8 md:p-10">
-              <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-gradient-to-br from-brand-teal/20 to-[#f58a8c]/20 blur-2xl" />
-              <div className="flex items-start gap-4">
-                <span className="mt-1 inline-grid h-8 w-8 place-items-center rounded-full bg-brand-teal/10 text-brand-teal">
-                  “
-                </span>
-                <p className="text-xl leading-relaxed text-brand-ink md:text-2xl">
-                  {active.quote}
-                </p>
-              </div>
-              <div className="mt-6 flex items-center gap-3">
-                <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[#f58a8c]/10 text-sm font-semibold text-[#f58a8c]">
-                  {active.name.split(' ').map((s) => s[0]).join('').slice(0, 2)}
-                </div>
-                <div className="text-sm">
-                  <div className="font-medium text-brand-ink">{active.name}</div>
-                  <div className="text-slate-600">{active.role}</div>
-                </div>
-              </div>
-            </Card>
-          </motion.div>
-
-          <div className="mt-6 flex items-center justify-between">
-            <button
-              aria-label="Previous testimonial"
-              onClick={prev}
-              className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-slate-700 transition hover:-translate-y-0.5 hover:shadow-md"
-            >
-              <ChevronLeft className="h-5 w-5" />
-            </button>
-            <div className="flex items-center gap-2">
-              {items.map((_, i) => (
-                <button
-                  key={i}
-                  aria-label={`Go to testimonial ${i + 1}`}
-                  onClick={() => setIdx(i)}
-                  className={`h-2.5 w-2.5 rounded-full transition ${
-                    i === idx ? 'bg-gradient-to-r from-brand-teal to-[#f58a8c]' : 'bg-slate-300'
-                  }`}
-                />
-              ))}
-            </div>
-            <button
-              aria-label="Next testimonial"
-              onClick={next}
-              className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-slate-700 transition hover:-translate-y-0.5 hover:shadow-md"
-            >
-              <ChevronRight className="h-5 w-5" />
-            </button>
-          </div>
-        </div>
-      </div>
-    </section>
-  )
-}
-
+/* ================== Sections still inline ================== */
 function ImpactStats() {
   const shouldReduce = useReducedMotion() ?? false
   return (
     <section className="bg-white">
       <div className="mx-auto max-w-7xl px-6 py-20">
-        <motion.div
-          className="mx-auto max-w-2xl text-center"
-          variants={staggerParent}
-          {...motionGuard(shouldReduce, 0.35)}
-        >
+        <motion.div className="mx-auto max-w-2xl text-center" variants={staggerParent} {...motionGuard(shouldReduce, 0.35)}>
           <motion.h3 variants={fadeUp} className="text-3xl font-semibold tracking-tight text-brand-ink md:text-4xl">
             We’re already making a difference
           </motion.h3>
@@ -607,11 +468,7 @@ function ImpactStats() {
           </motion.p>
         </motion.div>
 
-        <motion.div
-          variants={staggerParent}
-          {...motionGuard(shouldReduce, 0.35)}
-          className="mt-12 grid grid-cols-2 gap-6 md:grid-cols-4"
-        >
+        <motion.div variants={staggerParent} {...motionGuard(shouldReduce, 0.35)} className="mt-12 grid grid-cols-2 gap-6 md:grid-cols-4">
           <motion.div variants={fadeUp} className="rounded-2xl border border-slate-200 bg-white p-6 text-center">
             <AnimatedNumber to={2500} suffix="+" className="text-4xl font-bold text-brand-ink" />
             <p className="mt-2 text-sm text-slate-600">Hours of care delivered</p>
@@ -634,80 +491,42 @@ function ImpactStats() {
   )
 }
 
-/* =========================================
-   HOW IT WORKS — Vertical Timeline (animated progress, gradient line)
-========================================= */
 function HowItWorksTimeline() {
   const timelineRef = useRef<HTMLDivElement>(null)
   const shouldReduce = useReducedMotion() ?? false
-  const { scrollYProgress } = useScroll({
-    target: timelineRef,
-    offset: ['start 80%', 'end 20%'],
-  })
+  const { scrollYProgress } = useScroll({ target: timelineRef, offset: ['start 80%', 'end 20%'] })
   const scaleY = useTransform(scrollYProgress, [0, 1], shouldReduce ? [1, 1] : [0, 1])
 
   const steps = [
-    {
-      icon: <Phone className="h-5 w-5" />,
-      title: 'Tell us what’s needed',
-      desc: 'Share your parent’s routines, priorities, and any medical context.',
-    },
-    {
-      icon: <UserRoundCheck className="h-5 w-5" />,
-      title: 'We match & set up',
-      desc: 'Care manager, verified caregiver(s), and a clear weekly plan.',
-    },
-    {
-      icon: <ShieldCheck className="h-5 w-5" />,
-      title: 'You see everything',
-      desc: 'Visits, spends, updates—always visible in your family dashboard.',
-    },
+    { icon: <Phone className="h-5 w-5" />, title: 'Tell us what’s needed', desc: 'Share your parent’s routines, priorities, and any medical context.' },
+    { icon: <UserRoundCheck className="h-5 w-5" />, title: 'We match & set up', desc: 'Care manager, verified caregiver(s), and a clear weekly plan.' },
+    { icon: <ShieldCheck className="h-5 w-5" />, title: 'You see everything', desc: 'Visits, spends, updates—always visible in your family dashboard.' },
   ]
 
   return (
     <section className="bg-white">
       <div className="mx-auto max-w-5xl px-6 py-16">
-        <motion.div
-          className="text-center"
-          variants={staggerParent}
-          {...motionGuard(shouldReduce, 0.35)}
-        >
-          <motion.h3 variants={fadeUp} className="text-3xl font-semibold tracking-tight text-brand-ink md:text-4xl">
-            How it works
-          </motion.h3>
-          <motion.p variants={fadeUp} className="mt-3 text-slate-700">
-            Smooth onboarding in days, not weeks.
-          </motion.p>
+        <motion.div className="text-center" variants={staggerParent} {...motionGuard(shouldReduce, 0.35)}>
+          <motion.h3 variants={fadeUp} className="text-3xl font-semibold tracking-tight text-brand-ink md:text-4xl">How it works</motion.h3>
+          <motion.p variants={fadeUp} className="mt-3 text-slate-700">Smooth onboarding in days, not weeks.</motion.p>
         </motion.div>
 
         <div ref={timelineRef} className="relative mx-auto mt-10 grid max-w-3xl grid-cols-[24px_1fr] gap-x-4">
           <div className="relative">
             <div className="absolute left-1/2 top-0 -translate-x-1/2 h-full w-[2px] bg-slate-200" />
-            <motion.div
-              style={{ scaleY, transformOrigin: 'top' }}
-              className="absolute left-1/2 top-0 -translate-x-1/2 h-full w-[2px] bg-gradient-to-b from-brand-teal to-[#f58a8c]"
-            />
+            <motion.div style={{ scaleY, transformOrigin: 'top' }} className="absolute left-1/2 top-0 -translate-x-1/2 h-full w-[2px] bg-gradient-to-b from-brand-teal to-[#f58a8c]" />
           </div>
 
           <div className="space-y-8">
             {steps.map((s, i) => (
-              <motion.div
-                key={i}
-                variants={fadeUp}
-                {...motionGuard(shouldReduce, 0.5)}
-                className="relative"
-              >
+              <motion.div key={i} variants={fadeUp} {...motionGuard(shouldReduce, 0.5)} className="relative">
                 <div className="grid grid-cols-[24px_1fr] gap-x-4">
                   <div className="relative z-10 flex items-start justify-center">
-                    <div className="grid h-6 w-6 place-items-center rounded-full border border-brand-teal bg-white text-brand-teal shadow-sm">
-                      {s.icon}
-                    </div>
+                    <div className="grid h-6 w-6 place-items-center rounded-full border border-brand-teal bg-white text-brand-teal shadow-sm">{s.icon}</div>
                   </div>
                   <Card className="p-5">
                     <div className="flex items-center gap-2">
-                      <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-brand-teal/10 text-brand-teal text-xs font-semibold">
-                        {i + 1}
-                      </span>
+                      <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-brand-teal/10 text-brand-teal text-xs font-semibold">{i + 1}</span>
                       <h4 className="text-base font-semibold text-brand-ink">{s.title}</h4>
                     </div>
                     <p className="mt-2 text-slate-700">{s.desc}</p>
@@ -722,186 +541,28 @@ function HowItWorksTimeline() {
   )
 }
 
-function Plans() {
-  const shouldReduce = useReducedMotion() ?? false
-  return (
-    <section id="plans" className="relative">
-      <div className="pointer-events-none absolute inset-0 hero-gradient opacity-50" />
-      <div className="relative mx-auto max-w-7xl px-6 py-24">
-        <motion.div
-          className="mx-auto max-w-2xl text-center"
-          variants={staggerParent}
-          {...motionGuard(shouldReduce, 0.4)}
-        >
-          <motion.h2 variants={fadeUp} className="text-4xl font-bold tracking-tight text-brand-ink md:text-5xl">
-            One Standard Membership
-          </motion.h2>
-          <motion.p variants={fadeUp} className="mt-3 text-lg leading-relaxed text-slate-700">
-            Start with a single, all-round plan for daily living and safety. Add specialized services anytime.
-          </motion.p>
-        </motion.div>
-
-        <motion.div
-          variants={fadeUp}
-          {...motionGuard(shouldReduce, 0.3)}
-          className="mt-10 grid grid-cols-1 gap-8"
-        >
-          <motion.div whileHover={shouldReduce ? undefined : { y: -2 }} transition={{ duration: 0.2 }}>
-            <Card className="card-soft p-6 md:p-8">
-              <h3 className="text-2xl font-semibold text-brand-ink">Standard Plan</h3>
-              <p className="mt-3 text-slate-700">
-                Everything you need for day-to-day support and peace of mind — streamlined, reliable, transparent.
-              </p>
-              <ul className="mt-6 grid gap-3 text-slate-700 md:grid-cols-2">
-                <li>• Dedicated care manager</li>
-                <li>• Weekly wellness check-ins</li>
-                <li>• Errand coordination & bookings</li>
-                <li>• Family updates & dashboards</li>
-                <li>• 24/7 safety monitoring & emergency coordination</li>
-                <li>• On-demand driver access</li>
-              </ul>
-              <div className="mt-8 flex items-center justify-between">
-                <div>
-                  <div className="text-sm text-slate-600">Starting from</div>
-                  <div className="text-3xl font-bold text-brand-ink">
-                    NPR 24,999<span className="text-base font-medium text-slate-600">/mo</span>
-                  </div>
-                </div>
-                <a href="#addons">
-                  <Button
-                    className="
-                      relative rounded-2xl px-6 py-3 text-base font-semibold
-                      bg-gradient-to-r from-brand-teal to-[#6fd1d2] text-white shadow-[0_10px_20px_rgba(97,191,192,0.35)]
-                      hover:shadow-[0_16px_32px_rgba(97,191,192,0.45)] hover:translate-y-[-1px]
-                      active:translate-y-[0px] active:shadow-[0_8px_16px_rgba(97,191,192,0.35)]
-                      transition-all duration-200 ease-out
-                      focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-teal focus-visible:ring-offset-2
-                    "
-                  >
-                    Proceed to Add-Ons
-                  </Button>
-                </a>
-              </div>
-              <p className="mt-3 text-xs text-slate-500">*Pricing is placeholder; finalize in admin.</p>
-            </Card>
-          </motion.div>
-        </motion.div>
-      </div>
-    </section>
-  )
-}
-
-function AddOnsShowcase() {
-  const shouldReduce = useReducedMotion() ?? false
-  return (
-    <section id="addons" className="bg-gradient-to-b from-[#f58a8c]/10 via-white to-white">
-      <div className="mx-auto max-w-7xl px-6 py-24">
-        <motion.div
-          className="mx-auto max-w-2xl text-center"
-          variants={staggerParent}
-          {...motionGuard(shouldReduce, 0.35)}
-        >
-          <motion.h3 variants={fadeUp} className="text-3xl font-semibold tracking-tight text-brand-ink md:text-4xl">
-            Popular Add-Ons
-          </motion.h3>
-          <motion.p variants={fadeUp} className="mt-4 text-slate-700">
-            Extend your plan with specialist services anytime. No bundles, no lock-ins.
-          </motion.p>
-        </motion.div>
-
-        <motion.div
-          className="mt-10 grid gap-8 md:grid-cols-3"
-          variants={staggerParent}
-          {...motionGuard(shouldReduce, 0.3)}
-        >
-          {[
-            { icon: <ShieldCheck className="h-6 w-6 text-brand-teal/90" />, title: '24/7 On-Call Nurse', desc: 'Priority clinical support and triage when needed.' },
-            { icon: <Phone className="h-6 w-6 text-brand-teal/90" />, title: 'Telemedicine', desc: 'Doctor consults and follow-ups from home.' },
-            { icon: <Heart className="h-6 w-6 text-[#f58a8c]" />, title: 'Physiotherapy', desc: 'At-home sessions tailored to mobility goals.' },
-            { icon: <ShieldCheck className="h-6 w-6 text-brand-teal/90" />, title: 'Dementia Care', desc: 'Specialized routines and caregiver training.' },
-            { icon: <Phone className="h-6 w-6 text-brand-teal/90" />, title: 'Medication Delivery', desc: 'Refills and reminders handled end-to-end.' },
-            { icon: <Heart className="h-6 w-6 text-[#f58a8c]" />, title: 'Driver & Logistics', desc: 'Appointments, events, and errands on demand.' },
-          ].map((b, i) => (
-            <motion.div key={i} variants={fadeUp} whileHover={shouldReduce ? undefined : { y: -3 }} transition={{ duration: 0.2 }}>
-              <Card className="p-6">
-                <div className="flex items-start gap-4">
-                  <div className="grid h-12 w-12 place-items-center rounded-2xl bg-brand-teal/10">{b.icon}</div>
-                  <div>
-                    <h4 className="text-xl font-semibold text-brand-ink">{b.title}</h4>
-                    <p className="mt-2 text-slate-700">{b.desc}</p>
-                  </div>
-                </div>
-              </Card>
-            </motion.div>
-          ))}
-        </motion.div>
-
-        <div className="mt-10 text-center">
-          <Link to="/enroll">
-            <Button className="rounded-2xl px-6 py-3 bg-gradient-to-r from-brand-teal to-[#6fd1d2]">
-              Customize & Enroll
-            </Button>
-          </Link>
-        </div>
-      </div>
-    </section>
-  )
-}
-
-/* =========================================
-   SECURITY & PRIVACY — trust signals
-========================================= */
 function SecurityPrivacy() {
   const shouldReduce = useReducedMotion() ?? false
   const items = [
-    {
-      icon: <UserRoundCheck className="h-6 w-6 text-brand-teal" />,
-      title: 'Vetted caregivers',
-      desc: 'Background checks, references verified, and ongoing quality audits.',
-      bg: 'from-brand-teal/10 to-transparent',
-    },
-    {
-      icon: <Lock className="h-6 w-6 text-brand-ink" />,
-      title: 'Secure by default',
-      desc: 'Encrypted data at rest & in transit. Role-based access for families.',
-      bg: 'from-slate-300/20 to-transparent',
-    },
-    {
-      icon: <AlertTriangle className="h-6 w-6 text-[#f58a8c]" />,
-      title: 'Emergency playbooks',
-      desc: 'Clear SOPs for incidents: escalation, hospitals, and family alerts.',
-      bg: 'from-[#f58a8c]/10 to-transparent',
-    },
+    { icon: <UserRoundCheck className="h-6 w-6 text-brand-teal" />, title: 'Vetted caregivers', desc: 'Background checks, references verified, and ongoing quality audits.', bg: 'from-brand-teal/10 to-transparent' },
+    { icon: <Lock className="h-6 w-6 text-brand-ink" />, title: 'Secure by default', desc: 'Encrypted data at rest & in transit. Role-based access for families.', bg: 'from-slate-300/20 to-transparent' },
+    { icon: <AlertTriangle className="h-6 w-6 text-[#f58a8c]" />, title: 'Emergency playbooks', desc: 'Clear SOPs for incidents: escalation, hospitals, and family alerts.', bg: 'from-[#f58a8c]/10 to-transparent' },
   ]
   return (
     <section className="bg-white">
       <div className="mx-auto max-w-7xl px-6 py-18 md:py-24">
-        <motion.div
-          className="mx-auto max-w-2xl text-center"
-          variants={staggerParent}
-          {...motionGuard(shouldReduce, 0.4)}
-        >
-          <motion.h3 variants={fadeUp} className="text-3xl font-semibold tracking-tight text-brand-ink md:text-4xl">
-            Security & privacy
-          </motion.h3>
-          <motion.p variants={fadeUp} className="mt-3 text-slate-700">
-            Built for trust from day one — safe operations, secure data, clear escalation.
-          </motion.p>
+        <motion.div className="mx-auto max-w-2xl text-center" variants={staggerParent} {...motionGuard(shouldReduce, 0.4)}>
+          <motion.h3 variants={fadeUp} className="text-3xl font-semibold tracking-tight text-brand-ink md:text-4xl">Security & privacy</motion.h3>
+          <motion.p variants={fadeUp} className="mt-3 text-slate-700">Built for trust from day one — safe operations, secure data, clear escalation.</motion.p>
         </motion.div>
 
-        <motion.div
-          className="mt-10 grid gap-6 md:grid-cols-3"
-          variants={staggerParent}
-          {...motionGuard(shouldReduce, 0.35)}
-        >
+        <motion.div className="mt-10 grid gap-6 md:grid-cols-3" variants={staggerParent} {...motionGuard(shouldReduce, 0.35)}>
           {items.map((it, i) => (
             <motion.div key={i} variants={fadeUp} whileHover={shouldReduce ? undefined : { y: -3 }} transition={{ duration: 0.2 }}>
               <Card className="relative overflow-hidden p-6">
                 <div className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${it.bg}`} />
                 <div className="relative z-10">
-                  <div className="mb-3 inline-grid h-12 w-12 place-items-center rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
-                    {it.icon}
-                  </div>
+                  <div className="mb-3 inline-grid h-12 w-12 place-items-center rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">{it.icon}</div>
                   <h4 className="text-lg font-semibold text-brand-ink">{it.title}</h4>
                   <p className="mt-2 text-slate-700">{it.desc}</p>
                 </div>
@@ -935,21 +596,10 @@ function FAQ() {
           Frequently asked questions
         </motion.h3>
 
-        <motion.div
-          variants={staggerParent}
-          {...motionGuard(shouldReduce, 0.25)}
-          className="mt-10 space-y-4"
-        >
+        <motion.div variants={staggerParent} {...motionGuard(shouldReduce, 0.25)} className="mt-10 space-y-4">
           {items.map((it, i) => (
-            <motion.details
-              key={i}
-              variants={fadeUp}
-              className="group rounded-2xl border border-slate-200 bg-white p-5 transition
-                         open:shadow-soft hover:-translate-y-0.5"
-            >
-              <summary className="cursor-pointer list-none text-lg font-medium text-brand-ink">
-                {it.q}
-              </summary>
+            <motion.details key={i} variants={fadeUp} className="group rounded-2xl border border-slate-200 bg-white p-5 transition open:shadow-soft hover:-translate-y-0.5">
+              <summary className="cursor-pointer list-none text-lg font-medium text-brand-ink">{it.q}</summary>
               <p className="mt-2 text-slate-700">{it.a}</p>
             </motion.details>
           ))}
@@ -959,34 +609,21 @@ function FAQ() {
   )
 }
 
-/* =========================================
-   FINAL CTA — cinematic closer above footer
-========================================= */
 function FinalCTA() {
   const shouldReduce = useReducedMotion() ?? false
   return (
     <section className="relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-b from-brand-cloud/60 via-white to-white" />
       <div className="relative mx-auto max-w-5xl px-6 py-20 text-center">
-        <motion.div
-          variants={staggerParent}
-          {...motionGuard(shouldReduce, 0.35)}
-          className="space-y-6"
-        >
-          <motion.h3
-            variants={fadeUp}
-            className="text-3xl font-semibold leading-tight tracking-tight text-brand-ink md:text-4xl"
-          >
+        <motion.div variants={staggerParent} {...motionGuard(shouldReduce, 0.35)} className="space-y-6">
+          <motion.h3 variants={fadeUp} className="text-3xl font-semibold leading-tight tracking-tight text-brand-ink md:text-4xl">
             One platform. Total peace of mind.
           </motion.h3>
           <motion.p variants={fadeUp} className="mx-auto max-w-2xl text-slate-700">
             Start with the Standard membership today and add specialized services anytime — transparent,
             flexible, and built for families abroad.
           </motion.p>
-          <motion.div
-            variants={fadeUp}
-            className="mt-4 flex flex-wrap justify-center gap-3"
-          >
+          <motion.div variants={fadeUp} className="mt-4 flex flex-wrap justify-center gap-3">
             <Link to="/enroll">
               <Button className="rounded-2xl px-6 py-3 bg-gradient-to-r from-brand-teal to-[#6fd1d2]">
                 Get started <ArrowRight className="ml-2 h-4 w-4" />
