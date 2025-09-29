@@ -20,6 +20,30 @@ import { Button, Card, GhostButton } from '../components/ui'
 import { Link } from 'react-router-dom'
 
 export default function Home() {
+  // Smooth-scroll for same-page anchor links with small offset for the sticky header
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      const a = (e.target as HTMLElement)?.closest('a') as HTMLAnchorElement | null
+      if (!a) return
+      const href = a.getAttribute('href') || ''
+      if (!href.startsWith('#') || href === '#') return
+      const el = document.querySelector(href) as HTMLElement | null
+      if (!el) return
+      e.preventDefault()
+      const headerOffset = 80 // adjust if your navbar height changes
+      const y = el.getBoundingClientRect().top + window.scrollY - headerOffset
+      window.scrollTo({ top: y, behavior: 'smooth' })
+      // move focus for accessibility
+      el.setAttribute('tabindex', '-1')
+      el.focus({ preventScroll: true })
+      // cleanup tabindex after focus (optional)
+      const t = setTimeout(() => el.removeAttribute('tabindex'), 1000)
+      return () => clearTimeout(t)
+    }
+    document.addEventListener('click', handler)
+    return () => document.removeEventListener('click', handler)
+  }, [])
+
   return (
     <div className="min-h-screen w-full">
       {/* Accessible skip link (appears when focused) */}
@@ -115,7 +139,7 @@ function AnimatedNumber({
   }, [from, to, duration, hasAnimated])
 
   return (
-    <span ref={ref} className={className}>
+    <span ref={ref} className={className} aria-live="off">
       {prefix}
       {formatter(Math.round(val))}
       {suffix}
@@ -394,6 +418,9 @@ function StorySections() {
               src={it.img}
               alt=""
               className="h-[380px] w-full rounded-3xl object-cover shadow-soft"
+              loading="lazy"
+              decoding="async"
+              fetchPriority="low"
             />
             <div>
               <motion.h3 variants={fadeUp} className="text-3xl font-semibold leading-tight tracking-tight text-brand-ink md:text-4xl">
@@ -511,7 +538,7 @@ function Testimonials() {
             </Card>
           </motion.div>
 
-        <div className="mt-6 flex items-center justify-between">
+          <div className="mt-6 flex items-center justify-between">
             <button
               aria-label="Previous testimonial"
               onClick={prev}
@@ -982,7 +1009,7 @@ function Footer() {
     <footer className="border-t border-slate-200 bg-white">
       <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-6 py-10 md:flex-row">
         <div className="flex items-center gap-3">
-          <img src="/logo.png" className="h-8 w-8" alt="" />
+          <img src="/logo.png" className="h-8 w-8" alt="" loading="lazy" decoding="async" />
           <span className="text-sm text-slate-600">© {new Date().getFullYear()} EverCare Nepal</span>
         </div>
         <div className="text-sm text-slate-600">Made with ❤️ for families everywhere</div>
