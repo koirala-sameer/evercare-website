@@ -1,4 +1,4 @@
-import { motion, useScroll, useTransform } from 'framer-motion'
+import { motion, useScroll, useTransform, useReducedMotion } from 'framer-motion'
 import { useRef, useEffect, useState } from 'react'
 import {
   ArrowRight,
@@ -20,6 +20,16 @@ import { Button, Card, GhostButton } from '../components/ui'
 import { Link } from 'react-router-dom'
 
 export default function Home() {
+  // Detect reduced motion for anchor scrolling behavior
+  const [reduceMotion, setReduceMotion] = useState(false)
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const apply = () => setReduceMotion(!!mq.matches)
+    apply()
+    mq.addEventListener?.('change', apply)
+    return () => mq.removeEventListener?.('change', apply)
+  }, [])
+
   // Smooth-scroll for same-page anchor links with small offset for the sticky header
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -32,7 +42,7 @@ export default function Home() {
       e.preventDefault()
       const headerOffset = 80 // adjust if your navbar height changes
       const y = el.getBoundingClientRect().top + window.scrollY - headerOffset
-      window.scrollTo({ top: y, behavior: 'smooth' })
+      window.scrollTo({ top: y, behavior: reduceMotion ? 'auto' : 'smooth' })
       // move focus for accessibility
       el.setAttribute('tabindex', '-1')
       el.focus({ preventScroll: true })
@@ -42,7 +52,7 @@ export default function Home() {
     }
     document.addEventListener('click', handler)
     return () => document.removeEventListener('click', handler)
-  }, [])
+  }, [reduceMotion])
 
   return (
     <div className="min-h-screen w-full">
@@ -88,6 +98,13 @@ const fadeUp = {
   show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
 }
 
+// Helper to apply motion props conditionally when reduced motion is requested
+function motionGuard(shouldReduce: boolean, viewportAmount = 0.35) {
+  return shouldReduce
+    ? { /* no motion props */ }
+    : { initial: 'hidden' as const, whileInView: 'show' as const, viewport: { once: true, amount: viewportAmount } }
+}
+
 /** ---------- AnimatedNumber ---------- */
 type AnimatedNumberProps = {
   to: number
@@ -111,8 +128,15 @@ function AnimatedNumber({
   const [val, setVal] = useState(from)
   const [hasAnimated, setHasAnimated] = useState(false)
   const ref = useRef<HTMLSpanElement | null>(null)
+  const shouldReduce = useReducedMotion() ?? false
 
   useEffect(() => {
+    // If user prefers reduced motion, jump to final value
+    if (shouldReduce) {
+      setVal(to)
+      return
+    }
+
     const el = ref.current
     if (!el) return
 
@@ -136,7 +160,7 @@ function AnimatedNumber({
 
     obs.observe(el)
     return () => obs.disconnect()
-  }, [from, to, duration, hasAnimated])
+  }, [from, to, duration, hasAnimated, shouldReduce])
 
   return (
     <span ref={ref} className={className} aria-live="off">
@@ -149,12 +173,14 @@ function AnimatedNumber({
 
 function Hero() {
   const heroRef = useRef<HTMLDivElement>(null)
+  const shouldReduce = useReducedMotion() ?? false
   const { scrollYProgress } = useScroll({
     target: heroRef,
     offset: ['start end', 'end start'],
   })
-  const imgY = useTransform(scrollYProgress, [0, 1], [0, -40])
-  const overlayY = useTransform(scrollYProgress, [0, 1], [0, -16])
+  // Parallax disabled if reduced motion
+  const imgY = useTransform(scrollYProgress, [0, 1], shouldReduce ? [0, 0] : [0, -40])
+  const overlayY = useTransform(scrollYProgress, [0, 1], shouldReduce ? [0, 0] : [0, -16])
 
   return (
     <section ref={heroRef} className="relative overflow-hidden bg-gradient-to-b from-white via-brand-cloud/40 to-white">
@@ -162,9 +188,7 @@ function Hero() {
       <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 px-6 py-24 md:grid-cols-2 md:py-32">
         <motion.div
           variants={staggerParent}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.35 }}
+          {...motionGuard(shouldReduce, 0.35)}
         >
           <motion.div variants={fadeUp}>
             <span className="inline-block rounded-full bg-[#f58a8c]/15 px-3 py-1 text-sm font-semibold text-[#f58a8c] ring-1 ring-[#f58a8c]/30">
@@ -224,9 +248,9 @@ function Hero() {
         <div className="relative">
           <motion.div
             style={{ y: imgY }}
-            initial={{ opacity: 0, scale: 0.96 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
+            initial={shouldReduce ? undefined : { opacity: 0, scale: 0.96 }}
+            whileInView={shouldReduce ? undefined : { opacity: 1, scale: 1 }}
+            viewport={shouldReduce ? undefined : { once: true }}
             transition={{ duration: 0.6, ease: 'easeOut' }}
             className="glass relative rounded-3xl p-6 ring-1 ring-white/50 backdrop-blur will-change-transform"
           >
@@ -260,14 +284,13 @@ function Hero() {
 }
 
 function TrustBar() {
+  const shouldReduce = useReducedMotion() ?? false
   return (
     <section className="border-y border-slate-200 bg-white/60">
       <motion.div
         className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-8 px-6 py-6 text-slate-600"
         variants={staggerParent}
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true, amount: 0.4 }}
+        {...motionGuard(shouldReduce, 0.4)}
       >
         {[
           <>
@@ -298,14 +321,13 @@ function TrustBar() {
 
 /* Slim narrative line (kept) */
 function NarrativeLine() {
+  const shouldReduce = useReducedMotion() ?? false
   return (
     <section className="bg-white">
-      <div className="mx-auto max-w-5xl px-6 pb-10 -mt-6">
+      <div className="mx-auto -mt-6 max-w-5xl px-6 pb-10">
         <motion.p
           variants={staggerParent}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.5 }}
+          {...motionGuard(shouldReduce, 0.5)}
           className="text-center text-slate-700"
         >
           Real moments — from meals to medicine to meaningful time outside.
@@ -319,6 +341,7 @@ function NarrativeLine() {
    WHO IT'S FOR — audience row
 ========================================= */
 function WhoItsFor() {
+  const shouldReduce = useReducedMotion() ?? false
   const items = [
     {
       icon: <Users className="h-6 w-6" />,
@@ -349,9 +372,7 @@ function WhoItsFor() {
         <motion.div
           className="mx-auto max-w-2xl text-center"
           variants={staggerParent}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.35 }}
+          {...motionGuard(shouldReduce, 0.35)}
         >
           <motion.h3 variants={fadeUp} className="text-3xl font-semibold tracking-tight text-brand-ink md:text-4xl">
             Who it’s for
@@ -363,13 +384,11 @@ function WhoItsFor() {
 
         <motion.div
           variants={staggerParent}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.35 }}
+          {...motionGuard(shouldReduce, 0.35)}
           className="mt-10 grid gap-6 md:grid-cols-3"
         >
           {items.map((it, i) => (
-            <motion.div key={i} variants={fadeUp} whileHover={{ y: -3 }} transition={{ duration: 0.2 }}>
+            <motion.div key={i} variants={fadeUp} whileHover={shouldReduce ? undefined : { y: -3 }} transition={{ duration: 0.2 }}>
               <Card className="relative overflow-hidden p-6">
                 <div className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${it.tint}`} />
                 <div className="relative z-10">
@@ -396,6 +415,7 @@ function WhoItsFor() {
 }
 
 function StorySections() {
+  const shouldReduce = useReducedMotion() ?? false
   const items = [
     { title: 'Daily living, handled', text: 'Maid services, meal prep, medication reminders, and tidy homes — done reliably.', img: '/banner-caregiver.jpg' },
     { title: 'Always safe, always seen', text: '24/7 security surveillance and wellness checks give you peace of mind anywhere in the world.', img: '/banner-caregiver.jpg' },
@@ -408,9 +428,7 @@ function StorySections() {
           <motion.div
             key={idx}
             variants={staggerParent}
-            initial="hidden"
-            whileInView="show"
-            viewport={{ once: true, amount: 0.35 }}
+            {...motionGuard(shouldReduce, 0.35)}
             className={`grid items-center gap-10 md:grid-cols-2 ${idx % 2 === 1 ? 'md:[&>*:first-child]:order-2' : ''}`}
           >
             <motion.img
@@ -452,6 +470,7 @@ function StorySections() {
    TESTIMONIALS — overlap-free + vibrant accents
 ========================================= */
 function Testimonials() {
+  const shouldReduce = useReducedMotion() ?? false
   const items = [
     {
       quote:
@@ -476,10 +495,10 @@ function Testimonials() {
   const [paused, setPaused] = useState(false)
 
   useEffect(() => {
-    if (paused) return
+    if (paused || shouldReduce) return
     const t = setInterval(() => setIdx((p) => (p + 1) % items.length), 6000)
     return () => clearInterval(t)
-  }, [paused, items.length])
+  }, [paused, items.length, shouldReduce])
 
   const prev = () => setIdx((p) => (p - 1 + items.length) % items.length)
   const next = () => setIdx((p) => (p + 1) % items.length)
@@ -492,9 +511,7 @@ function Testimonials() {
         <motion.div
           className="text-center"
           variants={staggerParent}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.35 }}
+          {...motionGuard(shouldReduce, 0.35)}
         >
           <motion.h3 variants={fadeUp} className="text-3xl font-semibold tracking-tight text-brand-ink md:text-4xl">
             What families say
@@ -511,9 +528,9 @@ function Testimonials() {
         >
           <motion.div
             key={idx}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
+            initial={shouldReduce ? undefined : { opacity: 0, y: 8 }}
+            animate={shouldReduce ? undefined : { opacity: 1, y: 0 }}
+            exit={shouldReduce ? undefined : { opacity: 0, y: -8 }}
             transition={{ duration: 0.35, ease: 'easeOut' }}
           >
             <Card className="relative overflow-hidden p-8 md:p-10">
@@ -573,15 +590,14 @@ function Testimonials() {
 }
 
 function ImpactStats() {
+  const shouldReduce = useReducedMotion() ?? false
   return (
     <section className="bg-white">
       <div className="mx-auto max-w-7xl px-6 py-20">
         <motion.div
           className="mx-auto max-w-2xl text-center"
           variants={staggerParent}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.35 }}
+          {...motionGuard(shouldReduce, 0.35)}
         >
           <motion.h3 variants={fadeUp} className="text-3xl font-semibold tracking-tight text-brand-ink md:text-4xl">
             We’re already making a difference
@@ -593,9 +609,7 @@ function ImpactStats() {
 
         <motion.div
           variants={staggerParent}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.35 }}
+          {...motionGuard(shouldReduce, 0.35)}
           className="mt-12 grid grid-cols-2 gap-6 md:grid-cols-4"
         >
           <motion.div variants={fadeUp} className="rounded-2xl border border-slate-200 bg-white p-6 text-center">
@@ -625,11 +639,12 @@ function ImpactStats() {
 ========================================= */
 function HowItWorksTimeline() {
   const timelineRef = useRef<HTMLDivElement>(null)
+  const shouldReduce = useReducedMotion() ?? false
   const { scrollYProgress } = useScroll({
     target: timelineRef,
     offset: ['start 80%', 'end 20%'],
   })
-  const scaleY = useTransform(scrollYProgress, [0, 1], [0, 1])
+  const scaleY = useTransform(scrollYProgress, [0, 1], shouldReduce ? [1, 1] : [0, 1])
 
   const steps = [
     {
@@ -655,9 +670,7 @@ function HowItWorksTimeline() {
         <motion.div
           className="text-center"
           variants={staggerParent}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.35 }}
+          {...motionGuard(shouldReduce, 0.35)}
         >
           <motion.h3 variants={fadeUp} className="text-3xl font-semibold tracking-tight text-brand-ink md:text-4xl">
             How it works
@@ -681,9 +694,7 @@ function HowItWorksTimeline() {
               <motion.div
                 key={i}
                 variants={fadeUp}
-                initial="hidden"
-                whileInView="show"
-                viewport={{ once: true, amount: 0.5 }}
+                {...motionGuard(shouldReduce, 0.5)}
                 className="relative"
               >
                 <div className="grid grid-cols-[24px_1fr] gap-x-4">
@@ -712,6 +723,7 @@ function HowItWorksTimeline() {
 }
 
 function Plans() {
+  const shouldReduce = useReducedMotion() ?? false
   return (
     <section id="plans" className="relative">
       <div className="pointer-events-none absolute inset-0 hero-gradient opacity-50" />
@@ -719,9 +731,7 @@ function Plans() {
         <motion.div
           className="mx-auto max-w-2xl text-center"
           variants={staggerParent}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.4 }}
+          {...motionGuard(shouldReduce, 0.4)}
         >
           <motion.h2 variants={fadeUp} className="text-4xl font-bold tracking-tight text-brand-ink md:text-5xl">
             One Standard Membership
@@ -733,12 +743,10 @@ function Plans() {
 
         <motion.div
           variants={fadeUp}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.3 }}
+          {...motionGuard(shouldReduce, 0.3)}
           className="mt-10 grid grid-cols-1 gap-8"
         >
-          <motion.div whileHover={{ y: -2 }} transition={{ duration: 0.2 }}>
+          <motion.div whileHover={shouldReduce ? undefined : { y: -2 }} transition={{ duration: 0.2 }}>
             <Card className="card-soft p-6 md:p-8">
               <h3 className="text-2xl font-semibold text-brand-ink">Standard Plan</h3>
               <p className="mt-3 text-slate-700">
@@ -784,15 +792,14 @@ function Plans() {
 }
 
 function AddOnsShowcase() {
+  const shouldReduce = useReducedMotion() ?? false
   return (
     <section id="addons" className="bg-gradient-to-b from-[#f58a8c]/10 via-white to-white">
       <div className="mx-auto max-w-7xl px-6 py-24">
         <motion.div
           className="mx-auto max-w-2xl text-center"
           variants={staggerParent}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.35 }}
+          {...motionGuard(shouldReduce, 0.35)}
         >
           <motion.h3 variants={fadeUp} className="text-3xl font-semibold tracking-tight text-brand-ink md:text-4xl">
             Popular Add-Ons
@@ -805,9 +812,7 @@ function AddOnsShowcase() {
         <motion.div
           className="mt-10 grid gap-8 md:grid-cols-3"
           variants={staggerParent}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.3 }}
+          {...motionGuard(shouldReduce, 0.3)}
         >
           {[
             { icon: <ShieldCheck className="h-6 w-6 text-brand-teal/90" />, title: '24/7 On-Call Nurse', desc: 'Priority clinical support and triage when needed.' },
@@ -817,7 +822,7 @@ function AddOnsShowcase() {
             { icon: <Phone className="h-6 w-6 text-brand-teal/90" />, title: 'Medication Delivery', desc: 'Refills and reminders handled end-to-end.' },
             { icon: <Heart className="h-6 w-6 text-[#f58a8c]" />, title: 'Driver & Logistics', desc: 'Appointments, events, and errands on demand.' },
           ].map((b, i) => (
-            <motion.div key={i} variants={fadeUp} whileHover={{ y: -3 }} transition={{ duration: 0.2 }}>
+            <motion.div key={i} variants={fadeUp} whileHover={shouldReduce ? undefined : { y: -3 }} transition={{ duration: 0.2 }}>
               <Card className="p-6">
                 <div className="flex items-start gap-4">
                   <div className="grid h-12 w-12 place-items-center rounded-2xl bg-brand-teal/10">{b.icon}</div>
@@ -847,6 +852,7 @@ function AddOnsShowcase() {
    SECURITY & PRIVACY — trust signals
 ========================================= */
 function SecurityPrivacy() {
+  const shouldReduce = useReducedMotion() ?? false
   const items = [
     {
       icon: <UserRoundCheck className="h-6 w-6 text-brand-teal" />,
@@ -873,9 +879,7 @@ function SecurityPrivacy() {
         <motion.div
           className="mx-auto max-w-2xl text-center"
           variants={staggerParent}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.4 }}
+          {...motionGuard(shouldReduce, 0.4)}
         >
           <motion.h3 variants={fadeUp} className="text-3xl font-semibold tracking-tight text-brand-ink md:text-4xl">
             Security & privacy
@@ -888,12 +892,10 @@ function SecurityPrivacy() {
         <motion.div
           className="mt-10 grid gap-6 md:grid-cols-3"
           variants={staggerParent}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.35 }}
+          {...motionGuard(shouldReduce, 0.35)}
         >
           {items.map((it, i) => (
-            <motion.div key={i} variants={fadeUp} whileHover={{ y: -3 }} transition={{ duration: 0.2 }}>
+            <motion.div key={i} variants={fadeUp} whileHover={shouldReduce ? undefined : { y: -3 }} transition={{ duration: 0.2 }}>
               <Card className="relative overflow-hidden p-6">
                 <div className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${it.bg}`} />
                 <div className="relative z-10">
@@ -913,6 +915,7 @@ function SecurityPrivacy() {
 }
 
 function FAQ() {
+  const shouldReduce = useReducedMotion() ?? false
   const items = [
     { q: 'Where do you operate first?', a: 'Launching in Kathmandu & Pokhara, expanding nationwide.' },
     { q: 'Can I change add-ons anytime?', a: 'Yes, add or remove services monthly from your dashboard.' },
@@ -923,9 +926,9 @@ function FAQ() {
     <section id="faq" className="bg-brand-cloud/60">
       <div className="mx-auto max-w-5xl px-6 py-24">
         <motion.h3
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
+          initial={shouldReduce ? undefined : { opacity: 0, y: 16 }}
+          whileInView={shouldReduce ? undefined : { opacity: 1, y: 0 }}
+          viewport={shouldReduce ? undefined : { once: true, amount: 0.3 }}
           transition={{ duration: 0.5, ease: 'easeOut' }}
           className="text-center text-3xl font-bold tracking-tight text-brand-ink"
         >
@@ -934,9 +937,7 @@ function FAQ() {
 
         <motion.div
           variants={staggerParent}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.25 }}
+          {...motionGuard(shouldReduce, 0.25)}
           className="mt-10 space-y-4"
         >
           {items.map((it, i) => (
@@ -962,15 +963,14 @@ function FAQ() {
    FINAL CTA — cinematic closer above footer
 ========================================= */
 function FinalCTA() {
+  const shouldReduce = useReducedMotion() ?? false
   return (
     <section className="relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-b from-brand-cloud/60 via-white to-white" />
       <div className="relative mx-auto max-w-5xl px-6 py-20 text-center">
         <motion.div
           variants={staggerParent}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.35 }}
+          {...motionGuard(shouldReduce, 0.35)}
           className="space-y-6"
         >
           <motion.h3
