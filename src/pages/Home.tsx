@@ -4,6 +4,7 @@ import Footer from "../components/Footer";
 
 // Eager sections
 import Hero from "../sections/home/Hero";
+import WeeklyReport from "../sections/home/WeeklyReport";
 import TrustSection from "../sections/home/TrustSection";
 import TrustBar from "../sections/home/TrustBar";
 import NarrativeLine from "../sections/home/NarrativeLine";
@@ -13,17 +14,17 @@ import SecurityPrivacy from "../sections/home/SecurityPrivacy";
 import FAQ from "../sections/home/FAQ";
 import FinalCTA from "../sections/home/FinalCTA";
 
-// Lazy sections (heavier)
+// Lazy sections
 const Testimonials = lazy(() => import("../sections/home/Testimonials"));
 const Plans = lazy(() => import("../sections/home/Plans"));
 const AddOnsShowcase = lazy(() => import("../sections/home/AddOnsShowcase"));
 const ImpactStats = lazy(() => import("../sections/home/ImpactStats"));
 const HowItWorksTimeline = lazy(() => import("../sections/home/HowItWorksTimeline"));
+const FeelLikeFamily = lazy(() => import("../sections/home/FeelLikeFamily"));
 
 export default function Home() {
   const [reduceMotion, setReduceMotion] = useState(false);
 
-  // Respect prefers-reduced-motion globally
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
     const apply = () => setReduceMotion(!!mq.matches);
@@ -32,7 +33,6 @@ export default function Home() {
     return () => mq.removeEventListener?.("change", apply);
   }, []);
 
-  // Smooth-anchor scrolling
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       const a = (e.target as HTMLElement)?.closest("a") as HTMLAnchorElement | null;
@@ -56,7 +56,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen w-full">
-      {/* Accessibility Skip Link */}
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:shadow focus:ring-2 focus:ring-brand-teal"
@@ -68,11 +67,16 @@ export default function Home() {
 
       <main id="main-content">
         <Hero />
+        <WeeklyReport />
         <TrustSection />
         <TrustBar />
         <NarrativeLine />
         <WhoItsFor />
         <StorySections />
+
+        <Suspense fallback={<SectionSkeleton />}>
+          <FeelLikeFamily />
+        </Suspense>
 
         <Suspense fallback={<SectionSkeleton />}>
           <Testimonials />
