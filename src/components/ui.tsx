@@ -10,9 +10,7 @@ export type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
 }
 
 /**
- * Backward-compatible Button:
- * - By default keeps the same appearance you already had (primary/solid).
- * - Adds variant & size options for site-wide consistency.
+ * Unified modern button system with sharper, premium styling.
  */
 export function Button({
   className,
@@ -21,25 +19,26 @@ export function Button({
   ...props
 }: ButtonProps) {
   const base =
-    'inline-flex items-center justify-center font-semibold rounded-2xl transition ' +
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-teal/60 focus-visible:ring-offset-2 ' +
-    'disabled:opacity-50 disabled:cursor-not-allowed'
+    'inline-flex items-center justify-center font-semibold transition-all duration-150 ease-out ' +
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0E9384]/60 focus-visible:ring-offset-2 ' +
+    'disabled:opacity-50 disabled:cursor-not-allowed rounded-xl'
 
-  const lift = 'hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0'
   const sizes: Record<ButtonSize, string> = {
-    default: 'px-5 py-2.5 text-sm',
-    sm: 'px-3.5 py-2 text-sm',
-    lg: 'px-5 py-3 text-base',
+    default: 'px-5 py-2.5 text-sm md:text-base',
+    sm: 'px-3.5 py-1.5 text-sm',
+    lg: 'px-6 py-3 text-base',
   }
 
   const variants: Record<ButtonVariant, string> = {
-    // Matches your previous Button styling (solid brand)
-    primary: cn('bg-brand-teal text-white shadow-soft', lift),
-    // Brand outline for secondary actions
+    primary:
+      // Gradient + subtle lift
+      'bg-gradient-to-r from-[#0E9384] to-[#0C7C6F] text-white shadow-sm hover:shadow-md hover:brightness-110 active:brightness-95',
     outline:
-      'border border-brand-teal text-brand-teal bg-white hover:bg-brand-teal/10 shadow-soft',
-    // Subtle/tertiary action
-    ghost: 'text-brand-teal hover:bg-brand-teal/10',
+      // Sharp outline with subtle translucent hover
+      'border border-[#0E9384]/80 text-[#0E9384] bg-white hover:bg-[#E8F5F3] hover:shadow-sm active:bg-[#DFF4EF]',
+    ghost:
+      // Minimal ghost button
+      'text-[#0E9384] hover:bg-[#E8F5F3] active:bg-[#DFF4EF]',
   }
 
   return (
@@ -50,11 +49,7 @@ export function Button({
   )
 }
 
-/**
- * Backward-compatible GhostButton:
- * - Keeps the old look, now implemented via the outline variant.
- * - Existing imports won’t break.
- */
+/** Keeps backward compatibility */
 export function GhostButton({
   className,
   ...props
@@ -68,23 +63,26 @@ export function GhostButton({
   )
 }
 
-/** Unchanged */
+/** Card container */
 export function Card({
   className,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn('rounded-3xl border border-slate-200 bg-white p-6 shadow-soft', className)}
+      className={cn(
+        'rounded-2xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow duration-200',
+        className
+      )}
       {...props}
     />
   )
 }
 
-/** Unchanged */
+/** Badge */
 export function Badge({ children }: { children: React.ReactNode }) {
   return (
-    <span className="inline-flex items-center rounded-full bg-brand-teal/10 px-3 py-1 text-xs font-medium text-brand-teal">
+    <span className="inline-flex items-center rounded-full bg-[#0E9384]/10 px-3 py-1 text-xs font-medium text-[#0E9384]">
       {children}
     </span>
   )
