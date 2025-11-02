@@ -2,8 +2,7 @@ import { useEffect, useRef, useState, MouseEvent } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { Menu, X } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import PromoBanner from './PromoBanner'
-import TopBar from './TopBar' // ← NEW IMPORT
+import TopBar from './TopBar' // Top bar stays
 
 type NavItem = { label: string; href: string; id?: string }
 
@@ -110,11 +109,7 @@ export default function Navbar() {
         'border-b border-slate-200',
       ].join(' ')}
     >
-      <TopBar /> {/* ← NEW TOPBAR ADDED HERE */}
-      <PromoBanner
-        theme="teal"
-        message="Father’s Day Special: First month 15% off on Premium Care • Limited time"
-      />
+      <TopBar /> {/* ✅ Only TopBar remains */}
 
       <div className="mx-auto max-w-[1200px] flex items-center justify-between px-4 py-3 md:px-6">
         <Link to="/" className="flex items-center gap-3" onClick={() => setOpen(false)} aria-label="EverCare home">
