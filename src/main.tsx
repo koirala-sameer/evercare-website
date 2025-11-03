@@ -8,7 +8,6 @@ import "./index.css";
 
 // Pages
 import Home from "./pages/Home";
-import Enroll from "./pages/Enroll";
 import Services from "./pages/Services";
 
 // Floating WhatsApp CTA (keep this mounted only once)
@@ -19,7 +18,6 @@ import { usePerformanceMonitor } from "./hooks/usePerformanceMonitor";
 
 const router = createBrowserRouter([
   { path: "/", element: <Home /> },
-  { path: "/enroll", element: <Enroll /> },
   { path: "/services", element: <Services /> },
 ]);
 
