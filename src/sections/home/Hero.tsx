@@ -8,10 +8,12 @@ const staggerParent = {
   hidden: { opacity: 1 },
   show: { opacity: 1, transition: { staggerChildren: 0.12 } },
 };
+
 const fadeUp = {
   hidden: { opacity: 0, y: 18 },
   show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
 };
+
 function motionGuard(shouldReduce: boolean, viewportAmount = 0.35) {
   return shouldReduce
     ? {}
@@ -26,6 +28,10 @@ export default function Hero() {
   const shouldReduce = useReducedMotion() ?? false;
   const { isMobile } = useMobileOptimization();
 
+  // Dynamically resolve the background image
+  const basePath = import.meta.env.BASE_URL || "";
+  const heroImage = `${basePath}images/hands-care-bw.jpg`;
+
   const socialProofStats = [
     { icon: <Users className="h-4 w-4" />, text: "2500+ hours delivered" },
     { icon: <ShieldCheck className="h-4 w-4" />, text: "100% verified" },
@@ -38,17 +44,31 @@ export default function Hero() {
         isMobile ? "h-[580px]" : "h-[650px]"
       } flex items-center justify-center mobile-safe-area`}
     >
-      {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#E8F7F5] via-white to-[#FFF3F3]" />
-      <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_30%_30%,rgba(14,147,132,0.15),transparent_60%),radial-gradient(circle_at_70%_70%,rgba(245,138,140,0.15),transparent_60%)] animate-pulse-slow" />
-      <div className="absolute inset-0 bg-gradient-to-b from-white/40 via-white/60 to-white/85" />
+      {/* Background Layers */}
+      <div className="absolute inset-0 -z-20">
+        {/* Black-and-white caregiver hands image */}
+        <img
+          src={heroImage}
+          alt="Caregiver holding elderly hands"
+          className="h-full w-full object-cover opacity-50 mix-blend-multiply brightness-95"
+          onError={(e) => {
+            console.warn("Hero background image failed to load.");
+            e.currentTarget.style.display = "none";
+          }}
+        />
+        {/* Subtle brand gradient overlays */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#E8F7F5]/70 via-white/80 to-[#FFF3F3]/90" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(14,147,132,0.15),transparent_60%),radial-gradient(circle_at_70%_70%,rgba(245,138,140,0.15),transparent_60%)] animate-pulse-slow" />
+        <div className="absolute inset-0 bg-gradient-to-b from-white/40 via-white/60 to-white/85" />
+      </div>
 
+      {/* Hero Content */}
       <motion.div
         className="relative z-10 mx-auto max-w-6xl text-center px-4 sm:px-6"
         variants={staggerParent}
         {...motionGuard(shouldReduce, 0.4)}
       >
-        {/* Stats */}
+        {/* Stats Bar */}
         <motion.div
           variants={fadeUp}
           className="inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-2 text-xs sm:text-sm font-medium text-slate-700 backdrop-blur-sm ring-1 ring-slate-200/50 mb-6"
@@ -84,7 +104,7 @@ export default function Hero() {
           transparent reports, and 24/7 support.
         </motion.p>
 
-        {/* CTAs */}
+        {/* CTA Buttons */}
         <motion.div
           variants={fadeUp}
           className="mt-8 flex flex-col xs:flex-row justify-center gap-3 sm:gap-4 w-full max-w-md mx-auto"
@@ -104,6 +124,23 @@ export default function Hero() {
           </Link>
         </motion.div>
       </motion.div>
+
+      {/* Slow pulse animation keyframes */}
+      <style>{`
+        @keyframes pulse-slow {
+          0%, 100% {
+            transform: scale(1);
+            opacity: 1;
+          }
+          50% {
+            transform: scale(1.05);
+            opacity: 0.95;
+          }
+        }
+        .animate-pulse-slow {
+          animation: pulse-slow 12s ease-in-out infinite;
+        }
+      `}</style>
     </section>
   );
 }
