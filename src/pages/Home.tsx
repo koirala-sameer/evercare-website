@@ -11,6 +11,8 @@ import WhoItsFor from "../sections/home/WhoItsFor";
 import StorySections from "../sections/home/StorySection";
 import FAQ from "../sections/home/FAQ";
 import FinalCTA from "../sections/home/FinalCTA";
+import MissionStory from "../sections/home/MissionStory";
+import MeetTheTeam from "../sections/home/MeetTheTeam";
 
 // Lazy sections
 const Testimonials = lazy(() => import("../sections/home/Testimonials"));
@@ -76,6 +78,9 @@ export default function Home() {
         <Suspense fallback={<SectionSkeleton />}>
           <ImpactStats />
         </Suspense>
+
+        <MissionStory />
+        <MeetTheTeam />
 
         <Suspense fallback={<SectionSkeleton />}>
           <HowItWorksTimeline />
