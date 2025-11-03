@@ -4,14 +4,11 @@ import Footer from "../components/Footer";
 
 // Eager sections
 import Hero from "../sections/home/Hero";
-import PeaceOfMind from "../sections/home/PeaceOfMind"; // new addition
+import PeaceOfMind from "../sections/home/PeaceOfMind";
 import WeeklyReport from "../sections/home/WeeklyReport";
-import TrustSection from "../sections/home/TrustSection";
-import TrustBar from "../sections/home/TrustBar";
-import NarrativeLine from "../sections/home/NarrativeLine";
+import TrustAndSafety from "../sections/home/TrustAndSafety";
 import WhoItsFor from "../sections/home/WhoItsFor";
 import StorySections from "../sections/home/StorySection";
-import SecurityPrivacy from "../sections/home/SecurityPrivacy";
 import FAQ from "../sections/home/FAQ";
 import FinalCTA from "../sections/home/FinalCTA";
 
@@ -73,9 +70,10 @@ export default function Home() {
         <PeaceOfMind />
 
         <WeeklyReport />
-        <TrustSection />
-        <TrustBar />
-        <NarrativeLine />
+        
+        {/* Consolidated Trust Section - Replaces TrustSection, TrustBar, and SecurityPrivacy */}
+        <TrustAndSafety />
+
         <WhoItsFor />
         <StorySections />
 
@@ -103,7 +101,6 @@ export default function Home() {
           <AddOnsShowcase />
         </Suspense>
 
-        <SecurityPrivacy />
         <FAQ />
         <FinalCTA />
       </main>
