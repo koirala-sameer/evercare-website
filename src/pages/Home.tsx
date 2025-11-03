@@ -6,7 +6,6 @@ import StickyEnrollmentBar from "../components/StickyEnrollmentBar";
 // Eager sections
 import Hero from "../sections/home/Hero";
 import PeaceOfMind from "../sections/home/PeaceOfMind";
-import WeeklyReport from "../sections/home/WeeklyReport";
 import TrustAndSafety from "../sections/home/TrustAndSafety";
 import WhoItsFor from "../sections/home/WhoItsFor";
 import StorySections from "../sections/home/StorySection";
@@ -66,15 +65,8 @@ export default function Home() {
 
       <main id="main-content">
         <Hero />
-
-        {/* Newly added Peace of Mind section right under Hero */}
         <PeaceOfMind />
-
-        <WeeklyReport />
-        
-        {/* Consolidated Trust Section - Replaces TrustSection, TrustBar, and SecurityPrivacy */}
         <TrustAndSafety />
-
         <WhoItsFor />
         <StorySections />
 
@@ -107,8 +99,6 @@ export default function Home() {
       </main>
 
       <Footer />
-
-      {/* Sticky Enrollment Bar - Appears after 25% scroll */}
       <StickyEnrollmentBar scrollThreshold={0.25} />
     </div>
   );

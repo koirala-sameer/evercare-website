@@ -56,7 +56,7 @@ export default function TrustAndSafety() {
 
   return (
     <section className="bg-white">
-      {/* Trust Bar - Top */}
+      {/* Trust Bar */}
       <motion.div
         className="border-y border-slate-200 bg-white/60"
         variants={staggerParent}
@@ -119,69 +119,6 @@ export default function TrustAndSafety() {
               </Card>
             </motion.div>
           ))}
-        </motion.div>
-
-        {/* Weekly Care Example */}
-        <motion.div
-          variants={staggerParent}
-          {...motionGuard(shouldReduce, 0.3)}
-          className="mt-16 grid items-center gap-12 md:grid-cols-2"
-        >
-          <motion.div variants={fadeUp}>
-            <h3 className="text-2xl font-semibold text-brand-ink">
-              A week with EverCare
-            </h3>
-            <p className="mt-4 text-slate-700">
-              Consistent care, compassionate professionals, and real-time updates — 
-              so your loved ones always feel connected, supported, and safe.
-            </p>
-
-            <ul className="mt-6 space-y-4 text-slate-700">
-              <li className="flex items-center gap-2">
-                <ShieldCheck className="h-5 w-5 text-brand-teal" />
-                <span>Verified staff & safety protocols</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <Users className="h-5 w-5 text-brand-teal" />
-                <span>Transparent reporting you can trust</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <AlertTriangle className="h-5 w-5 text-brand-teal" />
-                <span>24/7 availability for emergencies</span>
-              </li>
-            </ul>
-          </motion.div>
-
-          <motion.div variants={fadeUp}>
-            <Card className="rounded-2xl border border-slate-200 bg-[#F4EFE9] p-6 shadow-sm">
-              <div className="flex items-center gap-2 text-brand-ink">
-                <Home className="h-5 w-5 text-brand-teal" />
-                <h3 className="text-xl font-semibold">Weekly Care Schedule</h3>
-              </div>
-              <ul className="mt-4 space-y-3 text-brand-ink/85">
-                <li>
-                  <span className="font-medium text-brand-ink">Mon:</span> Nurse checks BP, glucose, meds.
-                </li>
-                <li>
-                  <span className="font-medium text-brand-ink">Wed:</span> Home Specialist handles groceries & walk.
-                </li>
-                <li>
-                  <span className="font-medium text-brand-ink">Fri:</span> Weekly report sent to family.
-                </li>
-                <li>
-                  <span className="font-medium text-brand-ink">24/7:</span> Support line for any escalation.
-                </li>
-              </ul>
-              <div className="mt-6 rounded-xl border border-slate-200 bg-white/80 p-4 text-sm text-slate-600">
-                <p>
-                  <strong>Sample Report:</strong> BP: 126/78 · Glucose: 92 · Weight: 62kg
-                </p>
-                <p className="mt-2">
-                  <strong>Notes:</strong> Started evening walks. Reduced salt intake.
-                </p>
-              </div>
-            </Card>
-          </motion.div>
         </motion.div>
       </div>
     </section>

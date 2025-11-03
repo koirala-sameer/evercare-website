@@ -3,7 +3,6 @@ import { motion, useReducedMotion } from "framer-motion";
 import { Heart, ShieldCheck, Clock, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui";
 
-// -------- Motion Variants --------
 const staggerParent = {
   hidden: { opacity: 1 },
   show: { opacity: 1, transition: { staggerChildren: 0.12 } },
@@ -22,7 +21,6 @@ function motionGuard(shouldReduce: boolean, viewportAmount = 0.35) {
       };
 }
 
-// -------- Main Component --------
 export default function FeelLikeFamily() {
   const shouldReduce = useReducedMotion() ?? false;
 
@@ -75,46 +73,6 @@ export default function FeelLikeFamily() {
             >
               See a Sample Report
             </Button>
-          </div>
-        </motion.div>
-
-        {/* Right Visual Side */}
-        <motion.div
-          variants={fadeUp}
-          className="relative rounded-3xl bg-white p-8 shadow-lg ring-1 ring-slate-200 backdrop-blur-sm"
-        >
-          <h3 className="text-lg font-semibold text-brand-ink">
-            A Week with EverCare
-          </h3>
-
-          <div className="mt-5 space-y-4 text-slate-700">
-            <p>
-              <strong>Mon:</strong> Nurse checks BP, glucose, meds.
-            </p>
-            <p>
-              <strong>Wed:</strong> Home Specialist handles groceries & a short
-              walk.
-            </p>
-            <p>
-              <strong>Fri:</strong> Weekly report sent to family on WhatsApp.
-            </p>
-            <p>
-              <strong>24/7:</strong> Support line for any need or escalation.
-            </p>
-          </div>
-
-          <div className="mt-6 rounded-xl border border-slate-200 bg-white/60 p-5 text-sm text-slate-600 shadow-sm">
-            <p>
-              <strong>Vitals:</strong>{" "}
-              <span className="text-green-600 font-medium">Stable</span> — BP:
-              126/78 · Glucose: 92 · Weight: 62kg
-            </p>
-            <p className="mt-2">
-              <strong>Notes:</strong> Started evening walks. Reduced salt.{" "}
-            </p>
-            <p className="mt-2">
-              Photo evidence attached (meals, meds, walk).
-            </p>
           </div>
         </motion.div>
       </motion.div>
