@@ -1,19 +1,17 @@
 import React from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import { HeartHandshake, Home, Smile } from "lucide-react";
+import { Heart, ShieldCheck, Clock, MessageCircle } from "lucide-react";
+import { Button } from "@/components/ui";
 
-// ---------- Motion helpers ----------
+// -------- Motion Variants --------
 const staggerParent = {
   hidden: { opacity: 1 },
   show: { opacity: 1, transition: { staggerChildren: 0.12 } },
 };
-
 const fadeUp = {
-  hidden: { opacity: 0, y: 18 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+  hidden: { opacity: 0, y: 24 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: "easeOut" } },
 };
-
-// ---------- Motion guard ----------
 function motionGuard(shouldReduce: boolean, viewportAmount = 0.35) {
   return shouldReduce
     ? {}
@@ -24,63 +22,98 @@ function motionGuard(shouldReduce: boolean, viewportAmount = 0.35) {
       };
 }
 
-// ---------- Feel Like Family Section ----------
+// -------- Main Component --------
 export default function FeelLikeFamily() {
   const shouldReduce = useReducedMotion() ?? false;
 
   return (
-    <section className="bg-gradient-to-b from-white via-brand-cloud/30 to-brand-cloud/60 py-24">
+    <section className="relative overflow-hidden bg-gradient-to-b from-white via-brand-cloud/40 to-white py-28">
+      <div className="absolute inset-0 bg-[url('/noise-texture.png')] opacity-[0.03]" />
+
       <motion.div
         variants={staggerParent}
-        {...motionGuard(shouldReduce, 0.35)}
-        className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-16 px-6 md:flex-row"
+        {...motionGuard(shouldReduce, 0.4)}
+        className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-16 px-6 md:grid-cols-2"
       >
-        {/* Left text section */}
-        <motion.div variants={fadeUp} className="flex-1">
-          <h2 className="text-3xl font-semibold leading-tight tracking-tight text-brand-ink md:text-4xl">
-            Care that feels like family
+        {/* Left Text Side */}
+        <motion.div variants={fadeUp} className="space-y-6">
+          <h2 className="text-4xl font-semibold tracking-tight text-brand-ink md:text-5xl">
+            Care that feels like family.
           </h2>
-          <p className="mt-4 max-w-md text-lg leading-relaxed text-slate-700">
-            Compassion isn’t an extra — it’s the core of everything we do.
-            Every caregiver is trained not just in tasks, but in presence,
-            patience, and genuine human connection.
+          <p className="max-w-md text-lg leading-relaxed text-slate-700">
+            Consistent care, compassionate professionals, and real-time
+            transparency — so your loved ones always feel connected, supported,
+            and safe.
           </p>
 
-          <ul className="mt-6 space-y-3 text-slate-700">
-            <li className="flex items-center gap-2">
-              <HeartHandshake className="h-5 w-5 text-brand-teal" />
-              <span>Matched caregivers with empathy and consistency.</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <Home className="h-5 w-5 text-brand-teal" />
-              <span>Every visit logged, photographed, and confirmed in real time.</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <Smile className="h-5 w-5 text-brand-teal" />
-              <span>Families abroad stay connected through updates and smiles.</span>
-            </li>
+          <ul className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {[
+              { icon: <ShieldCheck className="h-5 w-5 text-brand-teal" />, label: "Verified staff & safety" },
+              { icon: <Heart className="h-5 w-5 text-brand-teal" />, label: "Transparent reporting" },
+              { icon: <Clock className="h-5 w-5 text-brand-teal" />, label: "24/7 availability" },
+              { icon: <MessageCircle className="h-5 w-5 text-brand-teal" />, label: "Real-time updates" },
+            ].map((item, i) => (
+              <motion.li
+                key={i}
+                variants={fadeUp}
+                whileHover={{ y: -3 }}
+                className="flex items-center gap-2 text-slate-700"
+              >
+                {item.icon}
+                <span>{item.label}</span>
+              </motion.li>
+            ))}
           </ul>
+
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Button className="rounded-2xl bg-brand-teal px-6 py-3 hover:bg-brand-teal/90">
+              How EverCare Works →
+            </Button>
+            <Button
+              variant="outline"
+              className="rounded-2xl border-brand-teal px-6 py-3 text-brand-teal hover:bg-brand-teal/10"
+            >
+              See a Sample Report
+            </Button>
+          </div>
         </motion.div>
 
-        {/* Right image/visual section */}
+        {/* Right Visual Side */}
         <motion.div
           variants={fadeUp}
-          className="flex-1 rounded-3xl bg-white shadow-md ring-1 ring-slate-200 overflow-hidden"
+          className="relative rounded-3xl bg-white p-8 shadow-lg ring-1 ring-slate-200 backdrop-blur-sm"
         >
-          <img
-            src="/banner-caregiver.jpg"
-            alt="EverCare caregivers comforting seniors"
-            className="h-[420px] w-full object-cover"
-            loading="lazy"
-            decoding="async"
-          />
-          <div className="p-6">
-            <blockquote className="text-slate-700 italic">
-              “They set up a clear routine—meals, meds, and a gentle walk every
-              evening. My father smiles more now.”
-            </blockquote>
-            <p className="mt-4 text-sm text-slate-600 font-medium">
-              — Prabina T., Daughter in Toronto
+          <h3 className="text-lg font-semibold text-brand-ink">
+            A Week with EverCare
+          </h3>
+
+          <div className="mt-5 space-y-4 text-slate-700">
+            <p>
+              <strong>Mon:</strong> Nurse checks BP, glucose, meds.
+            </p>
+            <p>
+              <strong>Wed:</strong> Home Specialist handles groceries & a short
+              walk.
+            </p>
+            <p>
+              <strong>Fri:</strong> Weekly report sent to family on WhatsApp.
+            </p>
+            <p>
+              <strong>24/7:</strong> Support line for any need or escalation.
+            </p>
+          </div>
+
+          <div className="mt-6 rounded-xl border border-slate-200 bg-white/60 p-5 text-sm text-slate-600 shadow-sm">
+            <p>
+              <strong>Vitals:</strong>{" "}
+              <span className="text-green-600 font-medium">Stable</span> — BP:
+              126/78 · Glucose: 92 · Weight: 62kg
+            </p>
+            <p className="mt-2">
+              <strong>Notes:</strong> Started evening walks. Reduced salt.{" "}
+            </p>
+            <p className="mt-2">
+              Photo evidence attached (meals, meds, walk).
             </p>
           </div>
         </motion.div>

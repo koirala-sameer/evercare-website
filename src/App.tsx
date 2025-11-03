@@ -4,7 +4,6 @@ type AnyComp = React.ComponentType<any>;
 type Mod = { default?: AnyComp };
 
 function pickByRegex(mods: Record<string, Mod>, rx: RegExp): AnyComp | null {
-  // Stable order for determinism
   const entries = Object.entries(mods).sort((a, b) => a[0].localeCompare(b[0]));
   for (const [path, mod] of entries) {
     if (rx.test(path.toLowerCase()) && mod?.default) return mod.default as AnyComp;
@@ -13,7 +12,6 @@ function pickByRegex(mods: Record<string, Mod>, rx: RegExp): AnyComp | null {
 }
 
 function pickPage(mods: Record<string, Mod>): AnyComp | null {
-  // Priority by common landing names
   const priorities = [
     /(^|\/)home(\.|\/)/i,
     /(^|\/)index(\.|\/)/i,
@@ -24,7 +22,6 @@ function pickPage(mods: Record<string, Mod>): AnyComp | null {
     const m = pickByRegex(mods, rx);
     if (m) return m;
   }
-  // Fallback: first default export
   const entries = Object.entries(mods).sort((a, b) => a[0].localeCompare(b[0]));
   for (const [, mod] of entries) {
     if (mod?.default) return mod.default as AnyComp;
