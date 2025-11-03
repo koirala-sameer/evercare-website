@@ -2,15 +2,11 @@
 
 // Extend env typing for your custom vars
 interface ImportMetaEnv {
-  readonly BASE_URL: string
-  readonly MODE: string
-  readonly DEV: boolean
-  readonly PROD: boolean
-  readonly SSR: boolean
-
-  // Custom (must start with VITE_)
+  readonly VITE_APP_TITLE: string
   readonly VITE_WHATSAPP_PHONE?: string
   readonly VITE_BRAND_NAME?: string
+  readonly VITE_EVERCARE_PHONE?: string
+  readonly VITE_EVERCARE_WHATSAPP?: string
 }
 
 interface ImportMeta {

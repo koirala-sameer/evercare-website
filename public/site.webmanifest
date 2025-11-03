@@ -1,13 +1,107 @@
 {
-  "name": "EverCare Nepal",
-  "short_name": "EverCare",
+  "name": "EverCare Nepal - Elder Care Platform",
+  "short_name": "EverCare Nepal",
+  "description": "Compassionate elder care coordination and home support in Nepal with radical transparency for families abroad",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#0ea5e9",
-  "description": "Holistic elder care coordination and home support in Nepal with radical transparency for families abroad.",
+  "theme_color": "#0E9384",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en",
+  "categories": ["health", "lifestyle", "family"],
+  "screenshots": [
+    {
+      "src": "/screenshots/mobile-1.png",
+      "sizes": "375x812",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "EverCare Nepal homepage on mobile"
+    },
+    {
+      "src": "/screenshots/tablet-1.png",
+      "sizes": "768x1024",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "EverCare Nepal services on tablet"
+    }
+  ],
   "icons": [
-    { "src": "/logo.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "/logo.png", "sizes": "512x512", "type": "image/png" }
+    {
+      "src": "/icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Enroll Now",
+      "short_name": "Enroll",
+      "description": "Start your care journey with EverCare",
+      "url": "/enroll",
+      "icons": [
+        {
+          "src": "/icons/shortcut-enroll-96x96.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Our Services",
+      "short_name": "Services",
+      "description": "View our care plans and add-ons",
+      "url": "/services",
+      "icons": [
+        {
+          "src": "/icons/shortcut-services-96x96.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    }
   ]
 }
