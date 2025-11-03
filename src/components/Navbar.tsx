@@ -112,6 +112,7 @@ export default function Navbar() {
       <TopBar />
 
       <div className="mx-auto max-w-[1200px] flex items-center justify-between px-4 py-3 md:px-6">
+        {/* Logo */}
         <Link to="/" className="flex items-center gap-3" onClick={() => setOpen(false)} aria-label="EverCare home">
           <img
             src={LOGO_SRC}
@@ -126,6 +127,7 @@ export default function Navbar() {
           />
         </Link>
 
+        {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-6 text-sm">
           {NAV_ITEMS.map((item) => {
             const isActive = activeId === item.id
@@ -149,23 +151,17 @@ export default function Navbar() {
           })}
         </nav>
 
+        {/* Right-side Contact button */}
         <div className="hidden md:flex items-center gap-3">
           <Link
-            to="/enroll"
-            className="group relative overflow-hidden rounded-lg bg-gradient-to-br from-[#0E9384] to-[#0A7568] px-6 py-3 text-white font-semibold shadow-lg hover:shadow-xl hover:shadow-[#0E9384]/25 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] cta-touch"
+            to="/contact"
+            className="rounded-lg border-2 border-[#0E9384] text-[#0E9384] font-semibold px-6 py-2.5 hover:bg-[#0E9384] hover:text-white transition-all duration-300 shadow-sm"
           >
-            <span className="relative z-10">Enroll</span>
-            <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
+            Contact
           </Link>
-          <a
-            href="#plans"
-            onClick={(e) => handleAnchorClick(e, 'plans')}
-            className="group relative rounded-lg border-2 border-[#0E9384] bg-transparent px-6 py-3 text-[#0E9384] font-semibold shadow-md hover:shadow-lg transition-all duration-300 hover:bg-[#0E9384] hover:text-white hover:scale-[1.02] active:scale-[0.98] cta-touch"
-          >
-            <span className="relative z-10">View Plans</span>
-          </a>
         </div>
 
+        {/* Mobile Menu Toggle */}
         <button
           ref={menuButtonRef}
           className="md:hidden ml-2 inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white p-3 text-[#112231] shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0E9384]/60 cta-touch mobile-tap-feedback"
@@ -178,6 +174,7 @@ export default function Navbar() {
         </button>
       </div>
 
+      {/* Mobile Menu */}
       <AnimatePresence>
         {open && (
           <motion.nav
@@ -209,22 +206,15 @@ export default function Navbar() {
                   </li>
                 )
               })}
-              <li className="pt-2 flex flex-col gap-2">
+              {/* Mobile contact button */}
+              <li className="pt-2">
                 <Link
-                  to="/enroll"
+                  to="/contact"
                   onClick={() => setOpen(false)}
-                  className="group relative overflow-hidden rounded-lg bg-gradient-to-br from-[#0E9384] to-[#0A7568] px-4 py-3 text-center text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] cta-touch mobile-tap-feedback"
+                  className="block rounded-lg border-2 border-[#0E9384] text-center text-[#0E9384] font-semibold px-4 py-3 hover:bg-[#0E9384] hover:text-white transition-all duration-300 shadow-sm"
                 >
-                  <span className="relative z-10">Enroll</span>
-                  <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
+                  Contact
                 </Link>
-                <a
-                  href="#plans"
-                  onClick={(e) => handleAnchorClick(e, 'plans')}
-                  className="group relative rounded-lg border-2 border-[#0E9384] bg-transparent px-4 py-3 text-center text-[#0E9384] font-semibold shadow-md hover:shadow-lg transition-all duration-300 hover:bg-[#0E9384] hover:text-white hover:scale-[1.02] active:scale-[0.98] cta-touch mobile-tap-feedback"
-                >
-                  <span className="relative z-10">View Plans</span>
-                </a>
               </li>
             </ul>
           </motion.nav>
