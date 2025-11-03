@@ -4,6 +4,7 @@ import Footer from "../components/Footer";
 
 // Eager sections
 import Hero from "../sections/home/Hero";
+import PeaceOfMind from "../sections/home/PeaceOfMind"; // new addition
 import WeeklyReport from "../sections/home/WeeklyReport";
 import TrustSection from "../sections/home/TrustSection";
 import TrustBar from "../sections/home/TrustBar";
@@ -67,6 +68,10 @@ export default function Home() {
 
       <main id="main-content">
         <Hero />
+
+        {/* Newly added Peace of Mind section right under Hero */}
+        <PeaceOfMind />
+
         <WeeklyReport />
         <TrustSection />
         <TrustBar />

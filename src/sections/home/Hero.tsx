@@ -35,44 +35,42 @@ export default function Hero() {
         }}
       />
       {/* Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-white/60 via-white/70 to-white/90" />
+      <div className="absolute inset-0 bg-gradient-to-b from-white/55 via-white/70 to-white/90" />
 
       {/* Content */}
       <motion.div
-        className="relative z-10 mx-auto max-w-5xl text-center px-6"
+        className="relative z-10 mx-auto max-w-6xl text-center px-6"
         variants={staggerParent}
         {...motionGuard(shouldReduce, 0.4)}
       >
         <motion.h1
           variants={fadeUp}
-          className="text-4xl font-bold md:text-5xl text-brand-ink drop-shadow-sm"
+          className="text-4xl md:text-5xl font-bold text-brand-ink drop-shadow-sm tracking-tight leading-tight"
         >
           Compassionate Care, Transparent Service
         </motion.h1>
 
         <motion.p
           variants={fadeUp}
-          className="mx-auto mt-4 max-w-2xl text-lg text-slate-700"
+          className="mx-auto mt-5 max-w-3xl text-lg md:text-xl text-slate-700 leading-relaxed"
         >
           Your parents cared for, your peace of mind guaranteed — with verified caregivers,
           transparent reports, and 24/7 support.
         </motion.p>
 
-        {/* ✅ Only these two buttons are changed */}
+        {/* Buttons */}
         <motion.div
           variants={fadeUp}
-          className="mt-8 flex justify-center gap-4 flex-wrap"
+          className="mt-10 flex justify-center gap-4 flex-wrap"
         >
-          {/* Enroll Now */}
-          <Link to="/services">
+          <Link to="/services" aria-label="Go to Services to enroll">
             <button className="group relative overflow-hidden rounded-2xl bg-gradient-to-r from-brand-teal to-[#6fd1d2] px-8 py-4 text-white font-semibold shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5">
               <span className="relative z-10">Enroll Now</span>
               <span className="absolute inset-0 bg-gradient-to-r from-[#6fd1d2] to-brand-teal opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </button>
           </Link>
 
-          {/* Explore Plans */}
-          <Link to="/services">
+          <Link to="/services" aria-label="Explore membership plans">
             <button className="group relative rounded-2xl border border-slate-300 px-8 py-4 text-brand-ink font-semibold overflow-hidden transition-all duration-300 hover:border-[#f58a8c] hover:text-[#f58a8c] hover:shadow-md">
               <span className="relative z-10">Explore Plans</span>
               <span className="absolute inset-0 bg-[#f58a8c]/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
