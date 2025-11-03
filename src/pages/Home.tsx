@@ -18,7 +18,6 @@ const Plans = lazy(() => import("../sections/home/Plans"));
 const AddOnsShowcase = lazy(() => import("../sections/home/AddOnsShowcase"));
 const ImpactStats = lazy(() => import("../sections/home/ImpactStats"));
 const HowItWorksTimeline = lazy(() => import("../sections/home/HowItWorksTimeline"));
-const FeelLikeFamily = lazy(() => import("../sections/home/FeelLikeFamily"));
 
 export default function Home() {
   const [reduceMotion, setReduceMotion] = useState(false);
@@ -69,10 +68,6 @@ export default function Home() {
         <TrustAndSafety />
         <WhoItsFor />
         <StorySections />
-
-        <Suspense fallback={<SectionSkeleton />}>
-          <FeelLikeFamily />
-        </Suspense>
 
         <Suspense fallback={<SectionSkeleton />}>
           <Testimonials />
