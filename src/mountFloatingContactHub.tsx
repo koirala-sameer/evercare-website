@@ -1,8 +1,8 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import FloatingWhatsApp from "./components/FloatingWhatsApp";
+import FloatingContactHub from "./components/FloatingContactHub";
 
-const mountId = "evercare-floating-whatsapp";
+const mountId = "evercare-contact-hub";
 let mount = document.getElementById(mountId);
 if (!mount) {
   mount = document.createElement("div");
@@ -13,6 +13,6 @@ if (!mount) {
 const root = ReactDOM.createRoot(mount);
 root.render(
   <React.StrictMode>
-    <FloatingWhatsApp />
+    <FloatingContactHub />
   </React.StrictMode>
 );

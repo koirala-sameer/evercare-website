@@ -10,8 +10,8 @@ import "./index.css";
 import Home from "./pages/Home";
 import Services from "./pages/Services";
 
-// Floating WhatsApp CTA (keep this mounted only once)
-import "./mountFloatingWhatsApp";
+// ✅ NEW: Unified EverCare Contact Hub
+import "./mountFloatingContactHub";
 
 // Performance monitoring
 import { usePerformanceMonitor } from "./hooks/usePerformanceMonitor";
@@ -21,31 +21,23 @@ const router = createBrowserRouter([
   { path: "/services", element: <Services /> },
 ]);
 
-// PWA Service Worker Registration
+// ✅ Optional: Register PWA Service Worker
 function registerServiceWorker() {
-  if ('serviceWorker' in navigator && import.meta.env.PROD) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js')
-        .then((registration) => {
-          console.log('SW registered: ', registration);
-        })
-        .catch((registrationError) => {
-          console.log('SW registration failed: ', registrationError);
-        });
+  if ("serviceWorker" in navigator && import.meta.env.PROD) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker
+        .register("/sw.js")
+        .then((registration) => console.log("✅ SW registered:", registration))
+        .catch((err) => console.log("❌ SW registration failed:", err));
     });
   }
 }
 
-// Performance Monitoring Component
+// ✅ Lightweight Performance Tracker
 function PerformanceTracker() {
   usePerformanceMonitor((metrics) => {
-    // You can use these metrics for:
-    // - Sending to analytics
-    // - Triggering alerts for poor performance
-    // - A/B testing different optimizations
-    console.log('📊 Performance Metrics Collected:', metrics);
+    console.log("📊 Performance Metrics Collected:", metrics);
   });
-
   return null;
 }
 
@@ -59,12 +51,10 @@ function AppWithPerformance() {
   );
 }
 
+// Initialize app
 const rootElement = document.getElementById("root");
-if (!rootElement) {
-  throw new Error("Root element not found");
-}
+if (!rootElement) throw new Error("Root element not found");
 
-// Register service worker
 registerServiceWorker();
 
 ReactDOM.createRoot(rootElement).render(
