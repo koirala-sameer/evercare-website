@@ -1,437 +1,142 @@
 /* =============================================================================
-   EverCare Theme (v1.1) — accessibility + polish
-   Notes:
-   - Keeps existing class names you described; adds safe utilities and tokens.
-   - Improves focus rings, reduced-motion, subtle dark-mode support.
-   - Button, card, pill tweaks to match modern hero styling.
+   Mobile Optimization & Touch Improvements
    ========================================================================== */
 
-/* ---------------------------
-   CSS Reset (opinionated lite)
-   --------------------------- */
-*,
-*::before,
-*::after { box-sizing: border-box; }
+/* Base mobile optimizations */
+@media (max-width: 768px) {
+  /* Improve tap targets - minimum 44px for accessibility */
+  .mobile-optimized button,
+  .mobile-optimized a,
+  .mobile-optimized [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 12px 16px;
+  }
 
-html:focus-within { scroll-behavior: smooth; }
-@media (prefers-reduced-motion: reduce) {
-  html:focus-within { scroll-behavior: auto; }
-}
+  /* Larger touch targets for critical CTAs */
+  .cta-touch {
+    min-height: 48px;
+    min-width: 48px;
+    padding: 14px 20px;
+  }
 
-body, h1, h2, h3, h4, h5, h6, p, figure, blockquote { margin: 0; }
-ul[role='list'], ol[role='list'] { list-style: none; }
-img, picture, video, canvas, svg { display: block; max-width: 100%; }
-input, button, textarea, select { font: inherit; }
-button { cursor: pointer; }
-:root { color-scheme: light dark; }
+  /* Optimize text sizing for mobile */
+  .mobile-optimized {
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
 
-/* -----------------------------------
-   Theme Tokens (light + dark surfaces)
-   ----------------------------------- */
-:root {
-  /* Brand */
-  --ec-brand:        #0ea5a4;   /* teal-500-ish */
-  --ec-brand-600:    #0b8584;
-  --ec-brand-700:    #086b6a;
+  /* Improve form elements for touch */
+  .mobile-optimized input,
+  .mobile-optimized select,
+  .mobile-optimized textarea {
+    font-size: 16px; /* Prevent zoom on iOS */
+    padding: 12px 16px;
+    min-height: 48px;
+  }
 
-  /* Accent / Supporting */
-  --ec-amber:        #f59e0b;
-  --ec-amber-600:    #d97706;
-  --ec-slate:        #334155;
+  /* Optimize spacing for mobile */
+  .mobile-optimized .section-spacing {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+  }
 
-  /* Text */
-  --ec-text:         #0f172a;   /* slate-900 */
-  --ec-text-muted:   #334155;   /* slate-700 */
-
-  /* Surfaces */
-  --ec-bg:           #ffffff;
-  --ec-bg-muted:     #f8fafc;   /* slate-50 */
-  --ec-card:         #ffffff;
-  --ec-border:       #e2e8f0;   /* slate-200 */
-
-  /* Focus */
-  --ec-focus:        #22d3ee;   /* cyan-400 */
-  --ec-focus-ring:   0 0 0 3px rgba(34, 211, 238, 0.45);
-
-  /* Shadows */
-  --ec-shadow-soft:  0 6px 20px rgba(2, 24, 43, 0.06);
-  --ec-shadow-md:    0 10px 30px rgba(2, 24, 43, 0.10);
-
-  /* Radii */
-  --ec-radius:       1rem;      /* ~ rounded-2xl */
-  --ec-radius-pill:  999px;
-
-  /* Transitions */
-  --ec-anim-fast:    150ms;
-  --ec-anim:         220ms;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --ec-text:        #e5e7eb;  /* gray-200 */
-    --ec-text-muted:  #cbd5e1;  /* slate-300 */
-    --ec-bg:          #0b1220;  /* deep slate */
-    --ec-bg-muted:    #0f172a;
-    --ec-card:        #0f1a2b;
-    --ec-border:      #1f2937;
-    --ec-shadow-soft: 0 6px 20px rgba(0,0,0,0.35);
-    --ec-shadow-md:   0 10px 30px rgba(0,0,0,0.45);
+  /* Reduce motion on mobile for better performance */
+  .mobile-optimized * {
+    animation-duration: 0.3s !important;
+    transition-duration: 0.3s !important;
   }
 }
 
-/* ------------------------
-   Base Typography & Layout
-   ------------------------ */
-body {
-  background: var(--ec-bg);
-  color: var(--ec-text);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
-}
+/* Touch-specific optimizations */
+@media (hover: none) and (pointer: coarse) {
+  /* Enhance hover states for touch devices */
+  .touch-optimized button:hover,
+  .touch-optimized a:hover {
+    transform: scale(1.02);
+    transition: transform 0.1s ease;
+  }
 
-.text-muted { color: var(--ec-text-muted); }
-.text-balance { text-wrap: balance; }
+  /* Remove hover effects that don't work well on touch */
+  .touch-optimized .hover-lift:hover {
+    transform: none;
+  }
 
-/* --------------
-   Focus Styling
-   -------------- */
-:focus-visible {
-  outline: none;
-  box-shadow: var(--ec-focus-ring);
-  border-radius: 8px;
-}
-a:focus-visible, button:focus-visible { outline: none; box-shadow: var(--ec-focus-ring); }
-
-/* Reduced motion opt-in */
-@media (prefers-reduced-motion: reduce) {
-  * { animation: none !important; transition: none !important; }
-}
-
-/* -------------
-   Scrollbars
-   ------------- */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: var(--ec-brand-600) transparent;
-}
-::-webkit-scrollbar { height: 10px; width: 10px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb {
-  background: var(--ec-border);
-  border-radius: 8px;
-}
-::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
-
-/* ------------------------
-   Containers & Utilities
-   ------------------------ */
-.container {
-  width: 100%;
-  max-width: 1200px;
-  margin-inline: auto;
-  padding-inline: 1rem;
-}
-
-.card {
-  background: var(--ec-card);
-  border: 1px solid var(--ec-border);
-  border-radius: var(--ec-radius);
-  box-shadow: var(--ec-shadow-soft);
-}
-
-.shadow-soft { box-shadow: var(--ec-shadow-soft); }
-.shadow-md-soft { box-shadow: var(--ec-shadow-md); }
-
-.glass {
-  background: linear-gradient(
-    to bottom right,
-    rgba(255,255,255,0.7),
-    rgba(255,255,255,0.45)
-  );
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255,255,255,0.35);
-}
-@media (prefers-color-scheme: dark) {
-  .glass {
-    background: linear-gradient(
-      to bottom right,
-      rgba(15,26,43,0.65),
-      rgba(15,26,43,0.35)
-    );
-    border-color: rgba(255,255,255,0.08);
+  /* Improve scrolling performance */
+  .touch-optimized {
+    -webkit-overflow-scrolling: touch;
   }
 }
 
-/* ----------------
-   Buttons & Pills
-   ---------------- */
-.btn {
-  --btn-bg: var(--ec-brand);
-  --btn-bg-hover: var(--ec-brand-600);
-  --btn-fg: #ffffff;
-
-  display: inline-flex;
-  align-items: center;
-  gap: .5rem;
-  border: 1px solid transparent;
-  border-radius: var(--ec-radius-pill);
-  padding: .65rem 1rem;
-  font-weight: 600;
-  line-height: 1;
-  background: var(--btn-bg);
-  color: var(--btn-fg);
-  transition: transform var(--ec-anim), box-shadow var(--ec-anim), background var(--ec-anim);
-  box-shadow: 0 2px 0 rgba(0,0,0,0.08);
-}
-.btn:hover { background: var(--btn-bg-hover); transform: translateY(-1px); }
-.btn:active { transform: translateY(0); }
-
-.btn-outline {
-  --btn-fg: var(--ec-brand-700);
-  background: transparent;
-  border-color: var(--ec-brand-600);
-  color: var(--btn-fg);
-}
-.btn-outline:hover {
-  background: rgba(14,165,164,0.10);
+/* Mobile-first responsive images */
+.mobile-optimized img {
+  max-width: 100%;
+  height: auto;
 }
 
-.btn-ghost {
-  background: transparent;
-  color: var(--ec-text);
-  border-color: transparent;
-}
-.btn-ghost:hover { background: rgba(2, 24, 43, 0.06); }
-
-.btn-amber {
-  --btn-bg: var(--ec-amber);
-  --btn-bg-hover: var(--ec-amber-600);
-}
-
-.pill {
-  display: inline-flex;
-  align-items: center;
-  gap: .5rem;
-  padding: .375rem .75rem;
-  border-radius: var(--ec-radius-pill);
-  background: rgba(14,165,164,0.12);
-  color: var(--ec-brand-700);
-  font-weight: 600;
-  border: 1px solid rgba(14,165,164,0.25);
-}
-
-/* -------------
-   Navbar states
-   ------------- */
-.navbar {
-  position: sticky;
-  top: 0;
-  z-index: 50;
-  transition: background var(--ec-anim), box-shadow var(--ec-anim);
-  backdrop-filter: saturate(180%) blur(8px);
-}
-
-.navbar--top {
-  background: rgba(255,255,255,0.90);
-  box-shadow: 0 1px 0 rgba(2,24,43,0.05);
-}
-.navbar--scrolled {
-  background: rgba(255,255,255,0.95);
-  box-shadow: 0 6px 20px rgba(2,24,43,0.08);
-}
-@media (prefers-color-scheme: dark) {
-  .navbar--top { background: rgba(11,18,32,0.70); }
-  .navbar--scrolled { background: rgba(11,18,32,0.85); }
-}
-
-/* ----------------
-   Promo Banner UI
-   ---------------- */
-.promo {
-  width: 100%;
-  display: grid;
-  grid-auto-flow: column;
-  place-items: center;
-  gap: .75rem;
-  padding: .5rem .75rem;
-  font-weight: 600;
-  border-bottom: 1px solid transparent;
-}
-
-.promo--teal {
-  color: #053d3c;
-  background: linear-gradient(180deg, rgba(14,165,164,0.13), rgba(14,165,164,0.06));
-  border-color: rgba(14,165,164,0.25);
-}
-.promo--amber {
-  color: #4a3000;
-  background: linear-gradient(180deg, rgba(245,158,11,0.16), rgba(245,158,11,0.08));
-  border-color: rgba(245,158,11,0.28);
-}
-.promo--slate {
-  color: #0f172a;
-  background: linear-gradient(180deg, rgba(51,65,85,0.12), rgba(51,65,85,0.05));
-  border-color: rgba(51,65,85,0.25);
-}
-@media (prefers-color-scheme: dark) {
-  .promo--teal { color: #c7faf7; border-color: rgba(34,211,238,0.25); }
-  .promo--amber { color: #fde68a; border-color: rgba(245,158,11,0.28); }
-  .promo--slate { color: #e5e7eb; border-color: rgba(100,116,139,0.25); }
-}
-
-.promo__close {
-  border: none;
-  background: transparent;
-  padding: .25rem;
-  border-radius: 8px;
-  line-height: 0;
-}
-.promo__close:hover { background: rgba(2,24,43,0.06); }
-@media (prefers-color-scheme: dark) {
-  .promo__close:hover { background: rgba(255,255,255,0.06); }
-}
-
-/* ----------
-   Hero Bits
-   ---------- */
-.hero-gradient {
-  background-image:
-    radial-gradient(80rem 40rem at 10% -10%, rgba(14,165,164,0.20), transparent 60%),
-    radial-gradient(50rem 25rem at 120% 10%, rgba(245,158,11,0.20), transparent 60%);
-}
-.hero-card {
-  border-radius: var(--ec-radius);
-  box-shadow: var(--ec-shadow-md);
-  background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(255,255,255,0.86));
-  border: 1px solid var(--ec-border);
-}
-@media (prefers-color-scheme: dark) {
-  .hero-card {
-    background: linear-gradient(180deg, rgba(15,26,43,0.92), rgba(15,26,43,0.82));
+/* Optimize loading for mobile */
+@media (max-width: 768px) {
+  .mobile-lazy {
+    loading: lazy;
+  }
+  
+  /* Reduce shadow intensity on mobile for better performance */
+  .mobile-optimized .card {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
 }
 
-/* -----------------
-   Feature “pills”
-   ----------------- */
-.feature-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: .5rem;
-  padding: .5rem .75rem;
-  border-radius: var(--ec-radius-pill);
-  border: 1px dashed rgba(14,165,164,0.35);
-  background: rgba(14,165,164,0.08);
-  color: var(--ec-brand-700);
-  font-weight: 600;
+/* Mobile navigation improvements */
+@media (max-width: 768px) {
+  .mobile-nav-optimized {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+  
+  /* Ensure content doesn't hide behind mobile browser UI */
+  .mobile-safe-area {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
 }
 
-/* -------------------
-   Lists & Checkmarks
-   ------------------- */
-.list-check {
-  display: grid;
-  gap: .5rem;
-  padding-left: 0;
-  margin: 0;
-}
-.list-check li {
-  list-style: none;
-  display: grid;
-  grid-template-columns: 1.125rem 1fr;
-  align-items: start;
-  gap: .5rem;
-}
-.list-check li::before {
-  content: "✓";
-  display: inline-grid;
-  place-items: center;
-  width: 1.125rem;
-  height: 1.125rem;
-  font-weight: 800;
-  border-radius: 4px;
-  background: rgba(14,165,164,0.18);
-  color: var(--ec-brand-700);
-  margin-top: .15rem;
+/* Performance optimizations for lower-powered devices */
+@media (max-width: 768px) and (prefers-reduced-data: reduce) {
+  .mobile-data-saving * {
+    animation: none !important;
+    transition: none !important;
+  }
+  
+  .mobile-data-saving img {
+    loading: lazy;
+    fetchpriority: low;
+  }
 }
 
-/* -------------------
-   Animations (gentle)
-   ------------------- */
-.fade-in-up {
-  opacity: 0;
-  transform: translateY(8px);
-  animation: fadeInUp var(--ec-anim) ease-out forwards;
-}
-@keyframes fadeInUp {
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* --------------
-   Badges & Chips
-   -------------- */
-.badge {
-  display: inline-flex;
-  align-items: center;
-  gap: .375rem;
-  padding: .25rem .5rem;
-  font-size: .825rem;
-  border-radius: 10px;
-  background: var(--ec-bg-muted);
-  color: var(--ec-text);
-  border: 1px solid var(--ec-border);
+/* Enhanced mobile typography */
+@media (max-width: 768px) {
+  .mobile-text-optimized {
+    line-height: 1.5;
+    letter-spacing: -0.01em;
+  }
+  
+  .mobile-text-optimized h1 {
+    font-size: 2rem;
+    line-height: 1.2;
+  }
+  
+  .mobile-text-optimized h2 {
+    font-size: 1.75rem;
+    line-height: 1.3;
+  }
+  
+  .mobile-text-optimized h3 {
+    font-size: 1.5rem;
+    line-height: 1.4;
+  }
 }
 
-/* -------------
-   Forms (lite)
-   ------------- */
-.input,
-.select,
-.textarea {
-  width: 100%;
-  background: var(--ec-card);
-  color: var(--ec-text);
-  border: 1px solid var(--ec-border);
-  border-radius: 12px;
-  padding: .65rem .8rem;
-  transition: box-shadow var(--ec-anim), border-color var(--ec-anim);
-}
-.input::placeholder,
-.textarea::placeholder { color: color-mix(in srgb, var(--ec-text-muted) 80%, transparent); }
-.input:focus,
-.select:focus,
-.textarea:focus {
-  border-color: var(--ec-brand);
-  box-shadow: var(--ec-focus-ring);
-}
-
-/* ---------------
-   Footer helpers
-   --------------- */
-.footer {
-  background: var(--ec-bg-muted);
-  border-top: 1px solid var(--ec-border);
-}
-
-/* ---------------
-   Z-index helpers
-   --------------- */
-.z-banner { z-index: 60; }
-.z-navbar { z-index: 50; }
-.z-fab    { z-index: 70; }
-
-/* --------------------------
-   Floating Action (optional)
-   -------------------------- */
-.fab {
-  position: fixed;
-  right: 1rem;
-  bottom: 1rem;
-  display: grid;
-  gap: .5rem;
-}
-.fab__btn {
-  composes: btn from global;
-  border-radius: 999px;
+/* Mobile-specific interaction feedback */
+.mobile-tap-feedback:active {
+  transform: scale(0.98);
+  opacity: 0.8;
+  transition: all 0.1s ease;
 }
