@@ -77,13 +77,13 @@ export default function Services() {
             transition={{ duration: 1 }}
             className="mt-4 text-lg text-slate-700"
           >
-            Flexible monthly plans and one-time care options — transparent, compassionate, and trusted.
+            Flexible monthly memberships and one-time services — compassionate, transparent, and trusted.
           </motion.p>
         </div>
       </section>
 
       {/* Plans Section */}
-      <section className="relative py-20 bg-gradient-to-b from-white via-brand-cloud/40 to-brand-cloud/60">
+      <section id="plans" className="relative py-20 bg-gradient-to-b from-white via-brand-cloud/40 to-brand-cloud/60">
         <div
           className="absolute inset-0 bg-cover bg-center opacity-20"
           style={{ backgroundImage: "url('/oldman-hands.jpg')" }}
@@ -118,11 +118,11 @@ export default function Services() {
                       </li>
                     ))}
                   </ul>
-                  <Link to="/enroll">
+                  <Link to="/contact">
                     <button
-                      className={`mt-4 w-full rounded-lg bg-gradient-to-br ${plan.gradient} text-white py-3 font-semibold shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-300`}
+                      className={`evercare-cta mt-4 w-full rounded-lg bg-gradient-to-br ${plan.gradient} text-white py-3 font-semibold shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-300`}
                     >
-                      Enroll Now
+                      Get Started
                     </button>
                   </Link>
                 </div>
@@ -133,7 +133,7 @@ export default function Services() {
       </section>
 
       {/* One-Time Services */}
-      <section className="relative py-24 bg-white">
+      <section id="onetime" className="relative py-24 bg-white">
         <div
           className="absolute inset-0 bg-cover bg-center opacity-10"
           style={{ backgroundImage: "url('/banner-caregiver.jpg')" }}
@@ -168,9 +168,9 @@ export default function Services() {
           <p className="mt-4 text-slate-700 max-w-2xl mx-auto">
             Join EverCare today and get full visibility into your parents' care — reliable, verified, and always on.
           </p>
-          <Link to="/enroll">
-            <button className="mt-8 rounded-lg bg-gradient-to-br from-[#0E9384] to-[#0A7568] px-8 py-4 text-white font-semibold shadow-2xl hover:shadow-3xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-300">
-              Get Started
+          <Link to="/contact">
+            <button className="evercare-cta mt-8 rounded-lg bg-gradient-to-br from-[#0E9384] to-[#0A7568] px-8 py-4 text-white font-semibold shadow-2xl hover:shadow-3xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-300">
+              Talk to Us
             </button>
           </Link>
         </div>
