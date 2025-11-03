@@ -3,11 +3,12 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { Button } from "../components/ui";
 
 const plans = [
   {
     title: "Basic Care",
-    price: "19.99",
+    price: "Starting at NPR 19,999/mo",
     features: [
       "Weekly wellness check-ins",
       "Errand coordination",
@@ -18,7 +19,7 @@ const plans = [
   },
   {
     title: "Enhanced Care",
-    price: "29.99",
+    price: "Starting at NPR 29,999/mo",
     features: [
       "Daily caregiver support",
       "Family dashboard reports",
@@ -30,7 +31,7 @@ const plans = [
   },
   {
     title: "Premium Care",
-    price: "49.99",
+    price: "Starting at NPR 49,999/mo",
     features: [
       "Dedicated care manager",
       "Advanced wellness analytics",
@@ -42,7 +43,7 @@ const plans = [
 ];
 
 const services = [
-  { title: "24/7 On-Call Nurse", desc: "Priority clinical support and triage." },
+  { title: "24/7 On-Call Nurse", desc: "Priority clinical support and triage when needed." },
   { title: "Telemedicine", desc: "Doctor consults and follow-ups from home." },
   { title: "Physiotherapy", desc: "Tailored mobility and recovery sessions." },
   { title: "Dementia Care", desc: "Specialized routines and caregiver training." },
@@ -56,7 +57,7 @@ export default function Services() {
       <Navbar />
 
       {/* Hero Banner */}
-      <section className="relative h-[400px] flex items-center justify-center overflow-hidden">
+      <section className="relative h-[420px] flex items-center justify-center overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: "url('/banner-caregiver.jpg')" }}
@@ -69,7 +70,7 @@ export default function Services() {
             transition={{ duration: 0.8 }}
             className="text-4xl md:text-5xl font-bold text-brand-ink"
           >
-            Choose the Plan that Fits Your Family
+            Personalized Care Plans for Every Family
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -77,8 +78,15 @@ export default function Services() {
             transition={{ duration: 1 }}
             className="mt-4 text-lg text-slate-700"
           >
-            Flexible monthly memberships and one-time services — compassionate, transparent, and trusted.
+            Flexible memberships and one-time services — compassionate, transparent, and trusted.
           </motion.p>
+          <div className="mt-6">
+            <Link to="#plans">
+              <Button className="bg-gradient-to-br from-[#0E9384] to-[#0A7568] text-white px-8 py-4 font-semibold">
+                View Care Plans
+              </Button>
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -109,9 +117,8 @@ export default function Services() {
                 />
                 <div className="relative z-10 text-center">
                   <h3 className="text-2xl font-bold text-brand-ink">{plan.title}</h3>
-                  <p className="text-4xl font-semibold text-[#f58a8c] mt-3">${plan.price}</p>
-                  <p className="text-sm text-slate-600 mb-6">per month</p>
-                  <ul className="space-y-3 text-slate-700 mb-6 text-left">
+                  <p className="text-lg font-semibold text-[#f58a8c] mt-2">{plan.price}</p>
+                  <ul className="mt-6 space-y-3 text-slate-700 mb-6 text-left">
                     {plan.features.map((feature, i) => (
                       <li key={i} className="flex items-start gap-2">
                         <span className="text-[#0E9384]">✓</span> {feature}
@@ -119,11 +126,9 @@ export default function Services() {
                     ))}
                   </ul>
                   <Link to="/contact">
-                    <button
-                      className={`evercare-cta mt-4 w-full rounded-lg bg-gradient-to-br ${plan.gradient} text-white py-3 font-semibold shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-300`}
-                    >
+                    <Button className={`w-full bg-gradient-to-br ${plan.gradient} text-white`}>
                       Get Started
-                    </button>
+                    </Button>
                   </Link>
                 </div>
               </motion.div>
@@ -168,11 +173,21 @@ export default function Services() {
           <p className="mt-4 text-slate-700 max-w-2xl mx-auto">
             Join EverCare today and get full visibility into your parents' care — reliable, verified, and always on.
           </p>
-          <Link to="/contact">
-            <button className="evercare-cta mt-8 rounded-lg bg-gradient-to-br from-[#0E9384] to-[#0A7568] px-8 py-4 text-white font-semibold shadow-2xl hover:shadow-3xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-300">
-              Talk to Us
-            </button>
-          </Link>
+          <div className="mt-8 flex flex-col sm:flex-row justify-center gap-4">
+            <Link to="/services#plans">
+              <Button className="bg-gradient-to-br from-[#0E9384] to-[#0A7568] text-white font-semibold">
+                View Care Plans
+              </Button>
+            </Link>
+            <Link to="/contact">
+              <Button
+                variant="outline"
+                className="border-2 border-brand-teal text-brand-teal font-semibold"
+              >
+                Talk to Us
+              </Button>
+            </Link>
+          </div>
         </div>
       </section>
 

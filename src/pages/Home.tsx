@@ -15,7 +15,6 @@ import MeetTheTeam from "../sections/home/MeetTheTeam";
 
 // Lazy sections
 const Testimonials = lazy(() => import("../sections/home/Testimonials"));
-const Plans = lazy(() => import("../sections/home/Plans"));
 const AddOnsShowcase = lazy(() => import("../sections/home/AddOnsShowcase"));
 const ImpactStats = lazy(() => import("../sections/home/ImpactStats"));
 const HowItWorksTimeline = lazy(() => import("../sections/home/HowItWorksTimeline"));
@@ -64,7 +63,9 @@ export default function Home() {
       <Navbar />
 
       <main id="main-content">
+        {/* Hero Section with unified CTAs */}
         <Hero />
+
         <PeaceOfMind />
         <TrustAndSafety />
         <WhoItsFor />
@@ -85,15 +86,9 @@ export default function Home() {
           <HowItWorksTimeline />
         </Suspense>
 
-        <Suspense fallback={<SectionSkeleton id="plans" />}>
-          <Plans />
-        </Suspense>
-
-        <Suspense fallback={<SectionSkeleton id="addons" />}>
-          <AddOnsShowcase />
-        </Suspense>
-
         <FAQ />
+
+        {/* Final unified CTA */}
         <FinalCTA />
       </main>
 
