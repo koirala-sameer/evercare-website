@@ -1,20 +1,34 @@
 {
   "compilerOptions": {
+    /* ✅ Core Language Features */
     "target": "ES2020",
     "useDefineForClassFields": true,
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
-    "skipLibCheck": true,
     "moduleResolution": "bundler",
+    "skipLibCheck": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
+
+    /* ✅ React & JSX Support */
     "jsx": "react-jsx",
+    "types": ["vite/client", "node"],
+
+    /* ✅ Strictness & Type Safety */
     "strict": true,
+    "forceConsistentCasingInFileNames": true,
+
+    /* ✅ Path Aliases (Matches Your Project Structure) */
     "baseUrl": "./src",
     "paths": {
       "@/*": ["*"]
     }
   },
-  "include": ["src"]
+
+  /* ✅ Include Only Source Code (avoid node_modules noise) */
+  "include": ["src"],
+
+  /* ✅ Optional Excludes (keeps editor cleaner) */
+  "exclude": ["node_modules", "dist", "build"]
 }
