@@ -40,6 +40,7 @@ export default function Hero() {
           backgroundPosition: "center",
         }}
       />
+      
       {/* Overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-white/55 via-white/70 to-white/90" />
 
@@ -49,7 +50,7 @@ export default function Hero() {
         variants={staggerParent}
         {...motionGuard(shouldReduce, 0.4)}
       >
-        {/* Social Proof Badge - NEW ADDITION */}
+        {/* Social Proof Badge */}
         <motion.div
           variants={fadeUp}
           className="inline-flex items-center gap-2 rounded-full bg-white/80 px-4 py-2 text-sm font-medium text-slate-700 backdrop-blur-sm ring-1 ring-slate-200/50 mb-6"
@@ -67,7 +68,7 @@ export default function Hero() {
           </div>
         </motion.div>
 
-        {/* Main Headline - KEEPING YOUR ORIGINAL TEXT */}
+        {/* Main Headline */}
         <motion.h1
           variants={fadeUp}
           className="text-4xl md:text-5xl font-bold text-brand-ink drop-shadow-sm tracking-tight leading-tight"
@@ -75,7 +76,7 @@ export default function Hero() {
           Compassionate Care, Transparent Service
         </motion.h1>
 
-        {/* Subtitle - KEEPING YOUR ORIGINAL TEXT */}
+        {/* Subtitle */}
         <motion.p
           variants={fadeUp}
           className="mx-auto mt-5 max-w-3xl text-lg md:text-xl text-slate-700 leading-relaxed"
@@ -84,7 +85,7 @@ export default function Hero() {
           transparent reports, and 24/7 support.
         </motion.p>
 
-        {/* Urgency & Trust Bar - NEW ADDITION */}
+        {/* Urgency & Trust Bar */}
         <motion.div
           variants={fadeUp}
           className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4 text-sm text-slate-600"
@@ -102,7 +103,7 @@ export default function Hero() {
           </div>
         </motion.div>
 
-        {/* Buttons - KEEPING YOUR ORIGINAL BUTTONS WITH ENHANCEMENTS */}
+        {/* Buttons */}
         <motion.div
           variants={fadeUp}
           className="mt-12 flex justify-center gap-4 flex-wrap"
@@ -121,7 +122,7 @@ export default function Hero() {
           </Link>
         </motion.div>
 
-        {/* Trust Indicators - NEW ADDITION */}
+        {/* Trust Indicators */}
         <motion.div
           variants={fadeUp}
           className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-6 text-xs text-slate-500"

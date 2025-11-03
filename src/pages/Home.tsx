@@ -1,6 +1,7 @@
 import React, { useEffect, useState, lazy, Suspense } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import StickyEnrollmentBar from "../components/StickyEnrollmentBar";
 
 // Eager sections
 import Hero from "../sections/home/Hero";
@@ -106,6 +107,9 @@ export default function Home() {
       </main>
 
       <Footer />
+
+      {/* Sticky Enrollment Bar - Appears after 25% scroll */}
+      <StickyEnrollmentBar scrollThreshold={0.25} />
     </div>
   );
 }

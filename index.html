@@ -43,6 +43,70 @@
     <link rel="preload" as="image" href="/logo.png" />
     <link rel="preload" as="image" href="/banner-caregiver.jpg" />
 
+    <!-- Critical CSS - Minimal version for above-the-fold content -->
+    <style>
+      /* Critical: Ensure content is visible during JS loading */
+      .js-loading * {
+        animation: none !important;
+        transition: none !important;
+      }
+      
+      /* Critical: Hero section fallback */
+      .hero-fallback {
+        position: relative;
+        overflow: hidden;
+        height: 650px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(to bottom, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.70) 50%, rgba(255,255,255,0.90) 100%);
+      }
+      
+      .hero-fallback::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image: url('/banner-caregiver.jpg');
+        background-size: cover;
+        background-position: center;
+        z-index: -1;
+      }
+      
+      .hero-content {
+        position: relative;
+        z-index: 10;
+        max-width: 72rem;
+        margin-left: auto;
+        margin-right: auto;
+        text-align: center;
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+      }
+      
+      .critical-headline {
+        font-size: 2.25rem;
+        font-weight: 700;
+        color: #0f172a;
+        line-height: 1.2;
+        letter-spacing: -0.025em;
+      }
+      
+      .critical-subtitle {
+        margin-top: 1.25rem;
+        max-width: 48rem;
+        margin-left: auto;
+        margin-right: auto;
+        font-size: 1.125rem;
+        color: #334155;
+        line-height: 1.75;
+      }
+      
+      @media (min-width: 768px) {
+        .critical-headline { font-size: 3rem; }
+        .critical-subtitle { font-size: 1.25rem; }
+      }
+    </style>
+
     <!-- Structured Data (JSON-LD) -->
     <script type="application/ld+json">
     {
@@ -84,8 +148,32 @@
     }
     </script>
   </head>
-  <body class="bg-white">
-    <div id="root"></div>
+  <body class="bg-white js-loading">
+    <div id="root">
+      <!-- Minimal fallback for faster perceived loading -->
+      <div class="hero-fallback">
+        <div class="hero-content">
+          <h1 class="critical-headline">
+            Compassionate Care, Transparent Service
+          </h1>
+          <p class="critical-subtitle">
+            Your parents cared for, your peace of mind guaranteed — with verified caregivers,
+            transparent reports, and 24/7 support.
+          </p>
+        </div>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      // Remove JS loading class once React hydrates
+      document.addEventListener('DOMContentLoaded', function() {
+        document.body.classList.remove('js-loading');
+        // Remove fallback once React loads
+        const fallback = document.querySelector('.hero-fallback');
+        if (fallback) {
+          setTimeout(() => fallback.remove(), 100);
+        }
+      });
+    </script>
   </body>
 </html>
