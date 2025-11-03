@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, MouseEvent } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { Menu, X } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import TopBar from './TopBar' // Top bar stays
+import TopBar from './TopBar'
 
 type NavItem = { label: string; href: string; id?: string }
 
@@ -109,7 +109,7 @@ export default function Navbar() {
         'border-b border-slate-200',
       ].join(' ')}
     >
-      <TopBar /> {/* ✅ Only TopBar remains */}
+      <TopBar />
 
       <div className="mx-auto max-w-[1200px] flex items-center justify-between px-4 py-3 md:px-6">
         <Link to="/" className="flex items-center gap-3" onClick={() => setOpen(false)} aria-label="EverCare home">
@@ -152,16 +152,17 @@ export default function Navbar() {
         <div className="hidden md:flex items-center gap-3">
           <Link
             to="/enroll"
-            className="inline-flex items-center rounded-lg bg-[#0E9384] px-4 py-2 text-white font-semibold shadow-sm hover:bg-[#0b7a6e] transition"
+            className="group relative overflow-hidden rounded-lg bg-gradient-to-br from-[#0E9384] to-[#0A7568] px-6 py-3 text-white font-semibold shadow-lg hover:shadow-xl hover:shadow-[#0E9384]/25 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
           >
-            Enroll
+            <span className="relative z-10">Enroll</span>
+            <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
           </Link>
           <a
             href="#plans"
             onClick={(e) => handleAnchorClick(e, 'plans')}
-            className="inline-flex items-center rounded-lg border border-[#0E9384] px-4 py-2 text-[#0E9384] hover:bg-[#E8F5F3] font-semibold transition"
+            className="group relative rounded-lg border-2 border-[#0E9384] bg-transparent px-6 py-3 text-[#0E9384] font-semibold shadow-md hover:shadow-lg transition-all duration-300 hover:bg-[#0E9384] hover:text-white hover:scale-[1.02] active:scale-[0.98]"
           >
-            View Plans
+            <span className="relative z-10">View Plans</span>
           </a>
         </div>
 
@@ -212,16 +213,17 @@ export default function Navbar() {
                 <Link
                   to="/enroll"
                   onClick={() => setOpen(false)}
-                  className="block rounded-lg bg-[#0E9384] px-3 py-2.5 text-center text-white font-semibold shadow-sm hover:bg-[#0b7a6e]"
+                  className="group relative overflow-hidden rounded-lg bg-gradient-to-br from-[#0E9384] to-[#0A7568] px-3 py-2.5 text-center text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
                 >
-                  Enroll
+                  <span className="relative z-10">Enroll</span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
                 </Link>
                 <a
                   href="#plans"
                   onClick={(e) => handleAnchorClick(e, 'plans')}
-                  className="block rounded-lg border border-[#0E9384] px-3 py-2.5 text-center text-[#0E9384] hover:bg-[#E8F5F3] font-semibold"
+                  className="group relative rounded-lg border-2 border-[#0E9384] bg-transparent px-3 py-2.5 text-center text-[#0E9384] font-semibold shadow-md hover:shadow-lg transition-all duration-300 hover:bg-[#0E9384] hover:text-white hover:scale-[1.02] active:scale-[0.98]"
                 >
-                  View Plans
+                  <span className="relative z-10">View Plans</span>
                 </a>
               </li>
             </ul>

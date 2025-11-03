@@ -26,7 +26,7 @@ export default function Enroll() {
           {/* Left: Add-Ons Checklist */}
           <div className="md:col-span-2 space-y-10">
             <div>
-              <Badge>Step 2 of 2</Badge>
+              <Badge sharp={true}>Step 2 of 2</Badge>
               <h1 className="mt-4 text-3xl font-semibold tracking-tight text-brand-ink md:text-4xl">
                 Customize with Add-Ons
               </h1>
@@ -42,22 +42,23 @@ export default function Enroll() {
                   {ADDONS.filter((a) => a.category === cat.name).map((a) => (
                     <Card
                       key={a.id}
+                      sharp={true}
                       onClick={() => toggle(a.id)}
                       className={`cursor-pointer border-2 transition ${
                         selected.includes(a.id)
-                          ? 'border-brand-teal ring-1 ring-brand-teal/50'
+                          ? 'border-[#0E9384] ring-1 ring-[#0E9384]/50'
                           : 'border-transparent hover:border-slate-200'
                       }`}
                     >
                       <div className="flex items-start gap-3">
-                        <div className="mt-1 grid h-10 w-10 place-items-center rounded-xl bg-brand-teal/10">
+                        <div className="mt-1 grid h-10 w-10 place-items-center rounded-lg bg-[#0E9384]/10">
                           {a.icon}
                         </div>
                         <div className="flex-1">
                           <h3 className="font-medium text-brand-ink flex items-center gap-2">
                             {a.title}
                             {selected.includes(a.id) && (
-                              <Check className="h-4 w-4 text-brand-teal" />
+                              <Check className="h-4 w-4 text-[#0E9384]" />
                             )}
                           </h3>
                           <p className="text-sm text-slate-600">{a.desc}</p>
@@ -75,7 +76,7 @@ export default function Enroll() {
 
           {/* Right: Price Summary */}
           <div className="md:sticky md:top-24 h-fit">
-            <Card className="p-6 shadow-lg">
+            <Card sharp={true} className="p-6 shadow-xl">
               <h2 className="text-xl font-semibold text-brand-ink mb-4">Your Plan</h2>
               <div className="space-y-3">
                 <div className="flex items-center justify-between text-slate-700">
@@ -100,9 +101,13 @@ export default function Enroll() {
 
               <div className="mt-6 flex flex-col gap-3">
                 <Link to="/">
-                  <GhostButton className="w-full rounded-2xl">Back to Home</GhostButton>
+                  <button className="w-full rounded-lg border-2 border-slate-300 bg-transparent px-6 py-3 text-slate-700 font-semibold shadow-md hover:shadow-lg hover:bg-slate-50 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]">
+                    Back to Home
+                  </button>
                 </Link>
-                <Button className="w-full rounded-2xl">Confirm & Continue</Button>
+                <button className="w-full rounded-lg bg-gradient-to-br from-[#0E9384] to-[#0A7568] px-6 py-3 text-white font-semibold shadow-lg hover:shadow-xl hover:shadow-[#0E9384]/25 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]">
+                  Confirm & Continue
+                </button>
               </div>
             </Card>
           </div>
@@ -132,7 +137,7 @@ const ADDONS = [
     desc: 'In-home sessions to maintain mobility and strength.',
     price: 5000,
     category: 'Health',
-    icon: <Activity className="h-5 w-5 text-brand-teal" />,
+    icon: <Activity className="h-5 w-5 text-[#0E9384]" />,
   },
   {
     id: 'telemed',
@@ -140,7 +145,7 @@ const ADDONS = [
     desc: 'On-demand video consults with trusted doctors.',
     price: 3000,
     category: 'Health',
-    icon: <Stethoscope className="h-5 w-5 text-brand-teal" />,
+    icon: <Stethoscope className="h-5 w-5 text-[#0E9384]" />,
   },
   {
     id: 'events',
@@ -148,7 +153,7 @@ const ADDONS = [
     desc: 'Planned activities, day trips, and social gatherings.',
     price: 4000,
     category: 'Lifestyle',
-    icon: <Calendar className="h-5 w-5 text-brand-teal" />,
+    icon: <Calendar className="h-5 w-5 text-[#0E9384]" />,
   },
   {
     id: 'concierge',
@@ -156,7 +161,7 @@ const ADDONS = [
     desc: 'Errands, shopping, and transport handled with care.',
     price: 3500,
     category: 'Lifestyle',
-    icon: <Car className="h-5 w-5 text-brand-teal" />,
+    icon: <Car className="h-5 w-5 text-[#0E9384]" />,
   },
   {
     id: 'dementia',
@@ -164,7 +169,7 @@ const ADDONS = [
     desc: 'Specialized routines and companionship for memory care.',
     price: 6000,
     category: 'Special Care',
-    icon: <Brain className="h-5 w-5 text-brand-teal" />,
+    icon: <Brain className="h-5 w-5 text-[#0E9384]" />,
   },
 ]
 

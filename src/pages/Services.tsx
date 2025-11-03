@@ -14,7 +14,7 @@ const plans = [
       "Care manager updates",
       "24/7 safety monitoring",
     ],
-    gradient: "from-brand-teal to-[#6fd1d2]",
+    gradient: "from-[#0E9384] to-[#0A7568]",
   },
   {
     title: "Enhanced Care",
@@ -37,7 +37,7 @@ const plans = [
       "Telehealth coordination",
       "Monthly family reports",
     ],
-    gradient: "from-brand-ink to-slate-700",
+    gradient: "from-[#112231] to-[#1a365d]",
   },
 ];
 
@@ -100,12 +100,12 @@ export default function Services() {
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: idx * 0.2 }}
-                className={`relative rounded-3xl shadow-2xl p-8 bg-white/70 backdrop-blur-md hover:scale-[1.03] transition-transform duration-300 ${
+                className={`relative rounded-2xl shadow-2xl p-8 bg-white/70 backdrop-blur-md hover:scale-[1.03] transition-transform duration-300 ${
                   plan.highlight ? "border-2 border-[#f58a8c]" : "border border-slate-200"
                 }`}
               >
                 <div
-                  className={`absolute inset-0 bg-gradient-to-br ${plan.gradient} opacity-10 rounded-3xl`}
+                  className={`absolute inset-0 bg-gradient-to-br ${plan.gradient} opacity-10 rounded-2xl`}
                 />
                 <div className="relative z-10 text-center">
                   <h3 className="text-2xl font-bold text-brand-ink">{plan.title}</h3>
@@ -114,13 +114,13 @@ export default function Services() {
                   <ul className="space-y-3 text-slate-700 mb-6 text-left">
                     {plan.features.map((feature, i) => (
                       <li key={i} className="flex items-start gap-2">
-                        <span className="text-brand-teal">✓</span> {feature}
+                        <span className="text-[#0E9384]">✓</span> {feature}
                       </li>
                     ))}
                   </ul>
                   <Link to="/enroll">
                     <button
-                      className={`mt-4 w-full rounded-2xl bg-gradient-to-r ${plan.gradient} text-white py-3 font-semibold shadow-md hover:opacity-90`}
+                      className={`mt-4 w-full rounded-lg bg-gradient-to-br ${plan.gradient} text-white py-3 font-semibold shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-300`}
                     >
                       Enroll Now
                     </button>
@@ -149,7 +149,7 @@ export default function Services() {
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: i * 0.1 }}
-                className="rounded-3xl bg-white/70 backdrop-blur-md border border-slate-200 shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all p-6"
+                className="rounded-2xl bg-white/70 backdrop-blur-md border border-slate-200 shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all p-6"
               >
                 <h3 className="text-xl font-semibold text-brand-ink mb-2">{service.title}</h3>
                 <p className="text-slate-600">{service.desc}</p>
@@ -160,16 +160,16 @@ export default function Services() {
       </section>
 
       {/* Final CTA */}
-      <section className="relative py-20 bg-gradient-to-r from-brand-teal/10 to-[#6fd1d2]/10 text-center">
+      <section className="relative py-20 bg-gradient-to-r from-[#0E9384]/10 to-[#0A7568]/10 text-center">
         <div className="relative z-10">
           <h3 className="text-3xl md:text-4xl font-semibold text-brand-ink">
             One Platform. Total Peace of Mind.
           </h3>
           <p className="mt-4 text-slate-700 max-w-2xl mx-auto">
-            Join EverCare today and get full visibility into your parents’ care — reliable, verified, and always on.
+            Join EverCare today and get full visibility into your parents' care — reliable, verified, and always on.
           </p>
           <Link to="/enroll">
-            <button className="mt-8 rounded-2xl bg-gradient-to-r from-brand-teal to-[#6fd1d2] px-8 py-4 text-white font-semibold hover:opacity-90 shadow-md">
+            <button className="mt-8 rounded-lg bg-gradient-to-br from-[#0E9384] to-[#0A7568] px-8 py-4 text-white font-semibold shadow-2xl hover:shadow-3xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-300">
               Get Started
             </button>
           </Link>
